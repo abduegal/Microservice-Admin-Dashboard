@@ -1,7 +1,7 @@
 Introduction
 =========
 
-This repository contains a microservice Dashboard and framework to operate the dashboard.
+This repository contains a microservice Dashboard and framework to operate the dashboard. 
 
 Dashboard:
 ----
@@ -16,17 +16,17 @@ Framework:
 ----
 The dashboard is shipped with a framework / library for dropwizard, which enables you to connect to the admin dashboard and use all its functions with the minimum line of code. It has the following features:
 
-  - Registers and configures your service with [Apache Zookeeper](http://zookeeper.apache.org/) with a single line of code.
+  - Registers and configures your service with [Apache Zookeeper](http://zookeeper.apache.org/) with a single line of code. 
   - It has a build in ServiceLocator, you can call other services by name (without knowing their address and / or port).
   - The ServiceLocator uses the [Netflix Feign](https://github.com/Netflix/feign) library to call other services through Java interfaces.
   - It has [Yammer Tenacity](https://github.com/yammer/tenacity) support build in.
-  - It has build in authentication support by adding the following piece to your confguration file.
-
-
+  - It has build in authentication support by adding the following piece to your confguration file.    
+ 
+        
     authentication:
         servicename: Login_service
-        path: /api/token/
-
+        path: /api/token/  
+  
 Screenshots
 ----
 ![alt tag](https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large1.png)
@@ -36,12 +36,13 @@ Screenshots
 ![alt tag](https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large5.png)
 ![alt tag](https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large6.png)
 
+
 Installation:
 ----
 - Install  [Apache Zookeeper](http://zookeeper.apache.org/) and run it.
 - Download the dashboard [here](#todo).
-- Run the dashboard through the following command:
-``` java -jar ....jar server config.yml```
+- Run the dashboard through the following command:  
+``` java -jar ....jar server config.yml``` 
 - The dashboard should be up and running on [http://localhost:8080](http://localhost:8080)
 
 Getting started
@@ -50,7 +51,7 @@ Getting started
 After you have got the dashboard up and running, create a new Dropwizard project.
 
 - Make your dropwizard Configuration class extend from MicroserviceConfig instead of the io.dropwizard.Configuration class.
-- Add the following line to your Dropwizard Application class:
+- Add the following line to your Dropwizard Application class: 
 
 
     @Override
@@ -59,18 +60,18 @@ After you have got the dashboard up and running, create a new Dropwizard project
     }
 - Add the following to your configuration.yml file:
 
-
+    
     discovery:
       serviceName: Example
       namespace: myapp
       #zookeeper:
       port: 2181
       listenAddress: 127.0.0.1
-
+    
     server:
       applicationConnectors:
       - type: http
-        port: 0
+        port: 0                          
       adminConnectors:
       - type: http
         port: 0
@@ -81,7 +82,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
             currentLogFilename: /tmp/example_service.log
             archive: false
             threshold: ALL
-
+    
     logging:
       appenders:
         - type: console
@@ -98,7 +99,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
 Optionally:
 - Use the Hystrix Latency and fault tolerance library by adding the following things to your Dropwizard Application class:
 
-
+    
     public enum DependencyKeys implements TenacityPropertyKey {
         Action;
 
@@ -146,7 +147,7 @@ This project uses a number of open source projects to work properly:
 * [Yammer Tenacity] - Dropwizard integration with Netflix Hystrix
 * [Dropwizard] - Java Framework
 * [AngularJS] - for the front-end
-* and more...
+* and more...         
 
 
 License
