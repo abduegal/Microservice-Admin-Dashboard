@@ -1,0 +1,19 @@
+test: true
+
+discovery:
+ namespace: admindashboard
+ #zookeeper:
+ port: 2181
+ listenAddress: 127.0.0.1
+
+namespaces:
+  - admindashboard
+  - myapp
+
+server:
+  applicationConnectors:
+  - type: http
+    port: 10001
+  adminConnectors:
+  - type: http
+    port: 10002

@@ -1,0 +1,16 @@
+discovery:
+  #zookeeper:
+  port: 2181
+  listenAddress: 127.0.0.1
+
+namespaces:
+  - myapp
+
+server:
+  #allow 1 dashboard service per server so specify port.
+  applicationConnectors:
+  - type: http
+    port: 8080
+  adminConnectors:
+  - type: http
+    port: 0

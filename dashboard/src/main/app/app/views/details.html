@@ -1,0 +1,26 @@
+<div class="row" ng-init="init()">
+
+  <h2>Details</h2>
+
+  <p>View the details of each individual service.</p>
+
+  <ul class="nav nav-tabs">
+    <li ng-class="{active: isCurrentNamespace(namespace)}" data-ng-click="setCurrentNamespace(namespace)"
+        data-ng-repeat="namespace in model.namespaces"><a href>{{namespace}}</a></li>
+  </ul>
+
+  <div class="col-md-2 services">
+    <ul class="nav nav-sidebar serviceList">
+      <li data-ng-class="{active: isSelected(service)}"
+          data-ng-repeat="service in model.services"
+          data-ng-click="selectService(service)">
+        <a href>{{service.name}} ({{service.data.listenAddress}}:{{service.data.listenPort}})</a>
+      </li>
+    </ul>
+
+  </div>
+  <div class="col-md-10" id="hystrix">
+     <div class="dependencies" id="dependencies"></div>
+  </div>
+
+</div>

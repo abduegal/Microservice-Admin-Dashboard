@@ -1,0 +1,30 @@
+
+discovery:
+  serviceName: Example
+  namespace: myapp
+  #zookeeper:
+  port: 2181
+  listenAddress: 127.0.0.1
+
+server:
+  applicationConnectors:
+  - type: http
+    port: 0
+  adminConnectors:
+  - type: http
+    port: 0
+  requestLog:
+      timeZone: UTC
+      appenders:
+      - type: file
+        currentLogFilename: /tmp/example_service.log
+        archive: false
+        threshold: ALL
+
+logging:
+  appenders:
+    - type: console
+    - type: file
+      currentLogFilename: /tmp/example_service.log
+      archive: false
+      threshold: ALL

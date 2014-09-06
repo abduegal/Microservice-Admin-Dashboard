@@ -1,0 +1,30 @@
+<div class="row" ng-init="init()">
+
+  <h2>Logs</h2>
+
+  <p>View the logfile of each service.</p>
+
+  <ul class="nav nav-tabs">
+    <li ng-class="{active: isCurrentNamespace(namespace)}" data-ng-click="setCurrentNamespace(namespace)"
+        data-ng-repeat="namespace in model.namespaces"><a href>{{namespace}}</a></li>
+  </ul>
+
+  <div class="col-md-2 services">
+    <ul class="nav nav-sidebar serviceList">
+      <li data-ng-class="{active: isSelected(service)}"
+          data-ng-repeat="service in model.services"
+          data-ng-click="selectService(service)">
+        <a href>{{service.name}} ({{service.data.listenAddress}}:{{service.data.listenPort}})</a>
+      </li>
+    </ul>
+
+  </div>
+  <div class="col-md-10" id="logfile">
+    <p>Read last <input class="form-control" style="width: 100px; display: inline-block" type="number"
+                        data-ng-model="lines"> lines </p>
+    <div id="logs" style="overflow-y: auto; width: 100%; height: 480px;">
+      <span data-ng-repeat="log in logs track by $index" ng-class="{logeven: $even, logodd: $odd}">{{log}}</span>
+    </div>
+  </div>
+
+</div>

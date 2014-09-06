@@ -1,0 +1,46 @@
+<ul class="nav nav-sidebar">
+
+  <div class="serverinfo">
+    <h4>Server info</h4>
+
+    <div class="serverinformation">
+      <b>Available processors</b><br/>
+      <span>{{systemInfo.availableProcessors}}</span><br/>
+    </div>
+
+    <div class="serverinformation">
+      <b>JVM Memory</b>
+      <div class="progress progress-striped">
+        <span class="progress-bar progress-bar-warning"
+              style="width: {{systemInfo.freeJVMMemoryInBytes / systemInfo.totalJVMMemoryInBytes * 100 }}%"></span>
+      </div>
+      <div>Free JVM memory: <b>{{toMB(systemInfo.freeJVMMemoryInBytes)}} MB </b></div>
+      <div>Total JVM memory: <b>{{toMB(systemInfo.totalJVMMemoryInBytes)}} MB </b></div>
+
+      <b>System Memory</b>
+      <div class="progress progress-striped">
+        <span class="progress-bar progress-bar-warning"
+              style="width: {{systemInfo.freeSystemMemory / systemInfo.totalSystemMemory * 100 }}%"></span>
+      </div>
+      <div>Free system memory: <b>{{toMB(systemInfo.freeSystemMemory)}} MB </b></div>
+      <div>Total system memory: <b>{{toMB(systemInfo.totalSystemMemory)}} MB </b></div>
+    </div>
+
+    <div class="serverinformation">
+      <b>Disk size</b>
+      <table class="table table-condensed">
+        <tr>
+          <th>Path</th><th>Total</th><th>Free</th><th>Usable</th>
+        </tr>
+        <tr data-ng-repeat="storage in systemInfo.systemStorageInformationList">
+          <td>{{storage.absolutePath}}</td>
+          <td>{{toMB(storage.totalspace)}}MB</td>
+          <td>{{toMB(storage.freespace)}}MB</td>
+          <td>{{toMB(storage.usablespace)}}MB</td>
+        </tr>
+      </table>
+    </div>
+
+
+  </div>
+</ul>

@@ -1,0 +1,89 @@
+
+.dashboard-header{
+    margin: 20px;
+    position: fixed;
+}
+
+.main{
+    margin-top: 70px;
+    border-top: 1px solid #ddd;
+}
+
+.serverswitch{
+    text-align: center;
+    word-wrap:break-word;
+}
+
+.serverswitch .active{
+    text-align: center;
+    font-weight: bold;
+}
+
+#chart{
+    border: 1px solid #ddd;
+    border-top-width: 0;
+    background-color: #fff;
+    height: 469px !important;
+}
+
+.sideoverview{
+    border: 1px solid #ddd;
+    border-top-width: 0;
+    height: 469px !important;
+    overflow-y: scroll
+}
+
+circle {
+    stroke-width: 2px;
+    stroke: #333;
+    transform: scale(1,1);
+
+}
+.node:hover circle {
+    stroke-width: 3px;
+    transform: scale(2,2);
+}
+.node:hover text {
+    text-decoration: underline;
+}
+
+.tags{
+    border: 1px solid #ddd !important;
+    box-shadow: 1px 1px 1px 0 #ddd inset !important;
+    margin: 0 !important;
+    border-radius: 4px;
+}
+
+tags-input .host{
+    margin: 0 !important;
+}
+
+.services {
+    height: 500px;
+}
+
+.serviceList{
+    height: 500px;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+#hystrix{
+    height: 500px;
+    overflow-y: auto;
+
+}
+
+#logs{
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+}
+
+#logs .logeven, #logs .logodd{
+    display: block;
+    border-bottom: 1px solid #ddd;
+}
+
+#logs .logodd{
+    background-color: #efefef;
+}
