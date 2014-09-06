@@ -48,6 +48,8 @@ Installation:
 Getting started
 ----
 
+> There is an example project included, which you can use as a reference.  
+
 After you have got the dashboard up and running, create a new Dropwizard project.
 
 - Add the following dependency
