@@ -50,18 +50,27 @@ Getting started
 
 After you have got the dashboard up and running, create a new Dropwizard project.
 
+- Add the following dependency
+```xml
+    <dependency>
+        <groupId>com.aegal</groupId>
+        <artifactId>microservice-framework-core</artifactId>
+        <version>0.8</version>
+    </dependency>
+```
 - Make your dropwizard Configuration class extend from MicroserviceConfig instead of the io.dropwizard.Configuration class.
 - Add the following line to your Dropwizard Application class: 
 
-      
-      @Override
-      public void initialize(Bootstrap<ExampleConfiguration> bootstrap) {
-          bootstrap.addBundle(new MicroserviceBundle<>());
-      }
+```java    
+    @Override
+    public void initialize(Bootstrap<ExampleConfiguration> bootstrap) {
+        bootstrap.addBundle(new MicroserviceBundle<>());
+    }
+```    
       
 - Add the following to your configuration.yml file:
 
-       
+```yml       
     discovery:
       serviceName: Example
       namespace: myapp
@@ -91,7 +100,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
           currentLogFilename: /tmp/example_service.log
           archive: false
           threshold: ALL
-          
+```          
 - The above snippet does the following things:
   - Defines the zookeeper connection properties.
   - Defines the name of the service (Example) and the namespace (important for the dashboard)
@@ -101,7 +110,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
 Optionally:
 - Use the Hystrix Latency and fault tolerance library by adding the following things to your Dropwizard Application class:
 
-      
+```java      
     public enum DependencyKeys implements TenacityPropertyKey {
         Action;
 
@@ -130,7 +139,7 @@ Optionally:
 
         InitializeTenacity.initialize(DependencyKeys.values());
     }
-     
+```
 
 Version
 ----
