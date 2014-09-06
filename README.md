@@ -53,21 +53,22 @@ After you have got the dashboard up and running, create a new Dropwizard project
 - Make your dropwizard Configuration class extend from MicroserviceConfig instead of the io.dropwizard.Configuration class.
 - Add the following line to your Dropwizard Application class: 
 
-
-    @Override
-    public void initialize(Bootstrap<ExampleConfiguration> bootstrap) {
-        bootstrap.addBundle(new MicroserviceBundle<>());
-    }
+      
+      @Override
+      public void initialize(Bootstrap<ExampleConfiguration> bootstrap) {
+          bootstrap.addBundle(new MicroserviceBundle<>());
+      }
+      
 - Add the following to your configuration.yml file:
 
-    
+       
     discovery:
       serviceName: Example
       namespace: myapp
       #zookeeper:
       port: 2181
       listenAddress: 127.0.0.1
-    
+       
     server:
       applicationConnectors:
       - type: http
@@ -82,7 +83,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
             currentLogFilename: /tmp/example_service.log
             archive: false
             threshold: ALL
-    
+      
     logging:
       appenders:
         - type: console
@@ -90,6 +91,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
           currentLogFilename: /tmp/example_service.log
           archive: false
           threshold: ALL
+          
 - The above snippet does the following things:
   - Defines the zookeeper connection properties.
   - Defines the name of the service (Example) and the namespace (important for the dashboard)
@@ -99,7 +101,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
 Optionally:
 - Use the Hystrix Latency and fault tolerance library by adding the following things to your Dropwizard Application class:
 
-    
+      
     public enum DependencyKeys implements TenacityPropertyKey {
         Action;
 
@@ -112,7 +114,7 @@ Optionally:
             };
         }
     }
-
+     
     @Override
     public void initialize(Bootstrap<ExampleConfiguration> bootstrap) {
         bootstrap.addBundle(new MicroserviceBundle<>());
@@ -121,14 +123,14 @@ Optionally:
                 .propertyKeys(DependencyKeys.values())
                 .build());
     }
-
+     
     @Override
     public void run(ExampleConfiguration exampleConfiguration, Environment environment) throws Exception {
         environment.jersey().register(ExampleResource.class);
 
         InitializeTenacity.initialize(DependencyKeys.values());
     }
-
+     
 
 Version
 ----
