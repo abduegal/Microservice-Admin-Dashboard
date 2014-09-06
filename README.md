@@ -40,9 +40,9 @@ Screenshots
 Installation:
 ----
 - Install  [Apache Zookeeper](http://zookeeper.apache.org/) and run it.
-- Download the dashboard [here](#todo).
+- Download the dashboard [here](https://github.com/abduegal/Microservice_admin_dashboard/raw/master/dashboard-release-0.8.zip) and extract the zip file.
 - Run the dashboard through the following command:  
-``` java -jar ....jar server config.yml``` 
+``` java -jar dashboard-0.8.jar server config.yml``` 
 - The dashboard should be up and running on [http://localhost:8080](http://localhost:8080)
 
 Getting started
