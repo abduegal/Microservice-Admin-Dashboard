@@ -3,7 +3,6 @@ package com.aegal.framework.core.api;
 import feign.RequestLine;
 
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Response;
 
 /**
  * User: A.Egal

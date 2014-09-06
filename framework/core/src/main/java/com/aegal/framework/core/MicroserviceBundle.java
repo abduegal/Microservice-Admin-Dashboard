@@ -20,11 +20,8 @@ import com.ge.snowizard.discovery.client.DiscoveryClientManager;
 import com.ge.snowizard.discovery.core.CuratorFactory;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.ge.snowizard.discovery.core.JacksonInstanceSerializer;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.auth.oauth.OAuthProvider;
-import io.dropwizard.jersey.DropwizardResourceConfig;
-import io.dropwizard.jersey.setup.JerseyContainerHolder;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.apache.curator.x.discovery.ServiceDiscovery;
@@ -34,9 +31,6 @@ import org.eclipse.jetty.servlets.CrossOriginFilter;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.ServerSocketChannel;
 import java.util.EnumSet;
 
 /**

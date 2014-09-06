@@ -4,17 +4,14 @@ import com.aegal.framework.core.ServiceLocator;
 import com.aegal.framework.core.api.Connections;
 import com.aegal.framework.core.exceptions.ServiceCallException;
 import com.aegal.framework.core.util.Guard;
-import com.aegal.framework.core.util.JsonConverter;
 import com.aegal.frontend.DependencyKeys;
 import com.aegal.frontend.dto.D3GraphDTO;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.yammer.tenacity.core.TenacityCommand;
 import feign.FeignException;
 import org.apache.curator.x.discovery.ServiceInstance;
 
 import javax.ws.rs.WebApplicationException;
-import java.io.IOException;
 import java.util.*;
 
 /**

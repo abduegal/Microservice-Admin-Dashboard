@@ -1,5 +1,6 @@
 package com.aegal.example;
 
+import com.aegal.example.resources.ExampleResource;
 import com.aegal.framework.core.MicroserviceBundle;
 import com.aegal.framework.core.tenacity.InitializeTenacity;
 import com.yammer.tenacity.core.bundle.TenacityBundleBuilder;
@@ -8,7 +9,6 @@ import com.yammer.tenacity.core.properties.TenacityPropertyKeyFactory;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import com.aegal.example.resources.ExampleResource;
 
 /**
  * User: A.Egal
