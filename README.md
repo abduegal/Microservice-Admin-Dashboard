@@ -22,11 +22,11 @@ The dashboard is shipped with a framework / library for dropwizard, which enable
   - It has [Yammer Tenacity](https://github.com/yammer/tenacity) support build in.
   - It has build in authentication support by adding the following piece to your confguration file.    
  
-        
+```        
     authentication:
         servicename: Login_service
         path: /api/token/  
-  
+```  
 Screenshots
 ----
 ![alt tag](https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large1.png)
