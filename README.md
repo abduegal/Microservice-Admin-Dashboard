@@ -1,4 +1,4 @@
-Introduction
+Dropwizard admin dashboard for microservices
 =========
 
 This repository contains a microservice Dashboard and framework to operate the dashboard. 
