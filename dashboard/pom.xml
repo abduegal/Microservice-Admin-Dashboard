@@ -14,7 +14,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.aegal</groupId>
+            <groupId>com.github.abduegal</groupId>
             <artifactId>microservice-framework-core</artifactId>
             <version>0.8</version>
         </dependency>

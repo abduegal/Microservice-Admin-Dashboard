@@ -53,7 +53,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
 - Add the following dependency
 ```xml
     <dependency>
-        <groupId>com.aegal</groupId>
+        <groupId>com.github.abduegal</groupId>
         <artifactId>microservice-framework-core</artifactId>
         <version>0.8</version>
     </dependency>

@@ -1,9 +1,7 @@
 # DOCKER-VERSION 1.2.0
 
-FROM    centos:centos6
+FROM    ubuntu
 maintainer Abdullahi Egal &lt;abdu.egal@gmail.com&gt;
-
-run cd ~
 
 # Install prerequisites
 run apt-get update
@@ -19,20 +17,18 @@ run apt-get install -y oracle-java8-installer
 run apt-get install -y git maven
 
 # Clone project
+run cd ~
 run git clone https://github.com/abduegal/Microservice-Admin-Dashboard.git
-run git checkout docker
+run cd Microservice-Admin-Dashboard && git fetch && git checkout docker
 
 # Build project
-run cd Microservice-Admin-Dashboard/dashboard &amp;&amp; mvn package
-run cd ~
-run cd Microservice-Admin-Dashboard/example &amp;&amp; mvn package
+run cd ~/Microservice-Admin-Dashboard/dashboard && mvn package
+run cd ~/Microservice-Admin-Dashboard/example && mvn package
 
 # Run both projects
-run cd ~/Microservice-Admin-Dashboard
-run nohup java -jar dashboard/target/dashboard-0.8.jar server dashboard/config.yml
+run cd ~/Microservice-Admin-Dashboard && nohup java -jar dashboard/target/dashboard-0.8.jar server dashboard/config.yml
 
-run cd ~/Microservice-Admin-Dashboard
-run nohup java -jar example/target/example-1.0-SNAPSHOT.jar server example/config.yml
+run cd ~/Microservice-Admin-Dashboard && nohup java -jar example/target/example-1.0-SNAPSHOT.jar server example/config.yml
 
 # Expose the http port
 expose 8080
