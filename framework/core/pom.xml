@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>microservice-framework</artifactId>
-        <groupId>com.aegal</groupId>
+        <groupId>com.github.abduegal</groupId>
         <version>0.8-snapshot</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
