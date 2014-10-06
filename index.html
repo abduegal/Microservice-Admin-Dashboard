@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Microservice-admin-dashboard by abduegal</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Microservice-admin-dashboard</h1>
+        <h2>An admin dashboard for microservices created with dropwizard.</h2>
+        <a href="https://github.com/abduegal/Microservice-Admin-Dashboard" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="dropwizard-admin-dashboard-for-microservices" class="anchor" href="#dropwizard-admin-dashboard-for-microservices"><span class="octicon octicon-link"></span></a>Dropwizard admin dashboard for microservices</h1>
+
+<p>This repository contains a microservice Dashboard and framework to operate the dashboard. </p>
+
+<h2>
+<a name="dashboard" class="anchor" href="#dashboard"><span class="octicon octicon-link"></span></a>Dashboard:</h2>
+
+<ul>
+<li>Metrics and healtcheck viewer for your DropWizard microservices.</li>
+<li>An overview of all microservices registered with <a href="http://zookeeper.apache.org/">Apache Zookeeper</a> allong with the <a href="https://github.com/Netflix/curator">Netflix Curator</a> plugin.</li>
+<li>A detailed performance metric for each individual service <a href="https://github.com/Netflix/Hystrix">Netflix Hystrix</a>
+</li>
+<li>Server overview that shows the CPU, RAM and Disk usage.</li>
+<li>Centralized log management without external dependencies! (it reads your file log)</li>
+</ul><h2>
+<a name="framework" class="anchor" href="#framework"><span class="octicon octicon-link"></span></a>Framework:</h2>
+
+<p>The dashboard is shipped with a framework / library for dropwizard, which enables you to connect to the admin dashboard and use all its functions with the minimum line of code. It has the following features:</p>
+
+<ul>
+<li>Registers and configures your service with <a href="http://zookeeper.apache.org/">Apache Zookeeper</a> with a single line of code. </li>
+<li>It has a build in ServiceLocator, you can call other services by name (without knowing their address and / or port).</li>
+<li>The ServiceLocator uses the <a href="https://github.com/Netflix/feign">Netflix Feign</a> library to call other services through Java interfaces.</li>
+<li>It has <a href="https://github.com/yammer/tenacity">Yammer Tenacity</a> support build in.</li>
+<li>It has build in authentication support by adding the following piece to your confguration file.<br>
+</li>
+</ul><pre><code>    authentication:
+        servicename: Login_service
+        path: /api/token/  
+</code></pre>
+
+<h2>
+<a name="screenshots" class="anchor" href="#screenshots"><span class="octicon octicon-link"></span></a>Screenshots</h2>
+
+<p><img src="https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large1.png" alt="alt tag"><img src="https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large2.png" alt="alt tag"><img src="https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large3.png" alt="alt tag"><img src="https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large4.png" alt="alt tag"><img src="https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large5.png" alt="alt tag"><img src="https://raw.githubusercontent.com/abduegal/Microservice_admin_dashboard/master/screenshots/large6.png" alt="alt tag"></p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation:</h2>
+
+<ul>
+<li>Install  <a href="http://zookeeper.apache.org/">Apache Zookeeper</a> and run it.</li>
+<li>Download the dashboard <a href="https://github.com/abduegal/Microservice_admin_dashboard/raw/master/dashboard-release-0.8.zip">here</a> and extract the zip file.</li>
+<li>Run the dashboard through the following command:<br><code>java -jar dashboard-0.8.jar server config.yml</code> </li>
+<li>The dashboard should be up and running on <a href="http://localhost:8080">http://localhost:8080</a>
+</li>
+</ul><h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
+
+<blockquote>
+<p>There is an example project included, which you can use as a reference.  </p>
+</blockquote>
+
+<p>After you have got the dashboard up and running, create a new Dropwizard project.</p>
+
+<ul>
+<li>Add the following dependency</li>
+</ul><div class="highlight highlight-xml"><pre>    <span class="nt">&lt;dependency&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>com.github.abduegal<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>microservice-framework-core<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>0.8<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+<ul>
+<li>Make your dropwizard Configuration class extend from MicroserviceConfig instead of the io.dropwizard.Configuration class.</li>
+<li>Add the following line to your Dropwizard Application class: </li>
+</ul><div class="highlight highlight-java"><pre>    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">initialize</span><span class="o">(</span><span class="n">Bootstrap</span><span class="o">&lt;</span><span class="n">ExampleConfiguration</span><span class="o">&gt;</span> <span class="n">bootstrap</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">bootstrap</span><span class="o">.</span><span class="na">addBundle</span><span class="o">(</span><span class="k">new</span> <span class="n">MicroserviceBundle</span><span class="o">&lt;&gt;());</span>
+    <span class="o">}</span>
+</pre></div>
+
+<ul>
+<li>Add the following to your configuration.yml file:</li>
+</ul><div class="highlight highlight-yml"><pre>    <span class="l-Scalar-Plain">discovery</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">serviceName</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Example</span>
+      <span class="l-Scalar-Plain">namespace</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">myapp</span>
+      <span class="c1">#zookeeper:</span>
+      <span class="l-Scalar-Plain">port</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">2181</span>
+      <span class="l-Scalar-Plain">listenAddress</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">127.0.0.1</span>
+
+    <span class="l-Scalar-Plain">server</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">applicationConnectors</span><span class="p-Indicator">:</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">http</span>
+        <span class="l-Scalar-Plain">port</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">0</span>                          
+      <span class="l-Scalar-Plain">adminConnectors</span><span class="p-Indicator">:</span>
+      <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">http</span>
+        <span class="l-Scalar-Plain">port</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">0</span>
+      <span class="l-Scalar-Plain">requestLog</span><span class="p-Indicator">:</span>
+          <span class="l-Scalar-Plain">timeZone</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">UTC</span>
+          <span class="l-Scalar-Plain">appenders</span><span class="p-Indicator">:</span>
+          <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">file</span>
+            <span class="l-Scalar-Plain">currentLogFilename</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/tmp/example_service.log</span>
+            <span class="l-Scalar-Plain">archive</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+            <span class="l-Scalar-Plain">threshold</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">ALL</span>
+
+    <span class="l-Scalar-Plain">logging</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">appenders</span><span class="p-Indicator">:</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">console</span>
+        <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">type</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">file</span>
+          <span class="l-Scalar-Plain">currentLogFilename</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">/tmp/example_service.log</span>
+          <span class="l-Scalar-Plain">archive</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+          <span class="l-Scalar-Plain">threshold</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">ALL</span>
+</pre></div>
+
+<ul>
+<li>The above snippet does the following things:
+
+<ul>
+<li>Defines the zookeeper connection properties.</li>
+<li>Defines the name of the service (Example) and the namespace (important for the dashboard)</li>
+<li>Tells the application to use a random port (0)</li>
+<li>Configures logging (the log file will be used for centralized logging).</li>
+</ul>
+</li>
+</ul><p>Optionally:</p>
+
+<ul>
+<li>Use the Hystrix Latency and fault tolerance library by adding the following things to your Dropwizard Application class:</li>
+</ul><div class="highlight highlight-java"><pre>    <span class="kd">public</span> <span class="kd">enum</span> <span class="n">DependencyKeys</span> <span class="kd">implements</span> <span class="n">TenacityPropertyKey</span> <span class="o">{</span>
+        <span class="n">Action</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="n">TenacityPropertyKeyFactory</span> <span class="nf">getTenacityPropertyKeyFactory</span><span class="o">()</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="k">new</span> <span class="nf">TenacityPropertyKeyFactory</span><span class="o">(){</span>
+                <span class="nd">@Override</span>
+                <span class="kd">public</span> <span class="n">TenacityPropertyKey</span> <span class="nf">from</span><span class="o">(</span><span class="n">String</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+                    <span class="k">return</span> <span class="n">DependencyKeys</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">value</span><span class="o">.</span><span class="na">toUpperCase</span><span class="o">());</span>
+                <span class="o">}</span>
+            <span class="o">};</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">initialize</span><span class="o">(</span><span class="n">Bootstrap</span><span class="o">&lt;</span><span class="n">ExampleConfiguration</span><span class="o">&gt;</span> <span class="n">bootstrap</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">bootstrap</span><span class="o">.</span><span class="na">addBundle</span><span class="o">(</span><span class="k">new</span> <span class="n">MicroserviceBundle</span><span class="o">&lt;&gt;());</span>
+        <span class="n">bootstrap</span><span class="o">.</span><span class="na">addBundle</span><span class="o">(</span><span class="n">TenacityBundleBuilder</span><span class="o">.</span><span class="na">newBuilder</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">propertyKeyFactory</span><span class="o">(</span><span class="n">DependencyKeys</span><span class="o">.</span><span class="na">getTenacityPropertyKeyFactory</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">propertyKeys</span><span class="o">(</span><span class="n">DependencyKeys</span><span class="o">.</span><span class="na">values</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">build</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">run</span><span class="o">(</span><span class="n">ExampleConfiguration</span> <span class="n">exampleConfiguration</span><span class="o">,</span> <span class="n">Environment</span> <span class="n">environment</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">environment</span><span class="o">.</span><span class="na">jersey</span><span class="o">().</span><span class="na">register</span><span class="o">(</span><span class="n">ExampleResource</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+
+        <span class="n">InitializeTenacity</span><span class="o">.</span><span class="na">initialize</span><span class="o">(</span><span class="n">DependencyKeys</span><span class="o">.</span><span class="na">values</span><span class="o">());</span>
+    <span class="o">}</span>
+</pre></div>
+
+<h2>
+<a name="version" class="anchor" href="#version"><span class="octicon octicon-link"></span></a>Version</h2>
+
+<p>0.8</p>
+
+<h2>
+<a name="tech" class="anchor" href="#tech"><span class="octicon octicon-link"></span></a>Tech</h2>
+
+<p>This project uses a number of open source projects to work properly:</p>
+
+<ul>
+<li>[Apache Zookeeper] - for service discovery</li>
+<li>[Netflix Curator] - Zookeeper client wrapper.</li>
+<li>[Netflix Hystrix] - Latency and fault tolerance library</li>
+<li>[Netflix Feign] - java to http client binder</li>
+<li>[Yammer Tenacity] - Dropwizard integration with Netflix Hystrix</li>
+<li>[Dropwizard] - Java Framework</li>
+<li>[AngularJS] - for the front-end</li>
+<li>and more...<br>
+</li>
+</ul><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>MIT</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/abduegal/Microservice-Admin-Dashboard/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/abduegal/Microservice-Admin-Dashboard/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/abduegal/Microservice-Admin-Dashboard"></a> is maintained by <a href="https://github.com/abduegal">abduegal</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
