@@ -4,8 +4,6 @@ import com.aegal.framework.core.api.AdminPort;
 import com.aegal.framework.core.exceptions.ServiceCallException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
@@ -54,7 +52,7 @@ public class ServiceLocator {
     /**
      * Constructs an API interface, for remote http calls with Feign.
      */
-    public <T> T build(InstanceMetadata instanceMetadata, Class<T> clazz) throws ServiceCallException {
+    public <T> T build(InstanceMetadata instanceMetadata, Class<T> clazz) {
         return Feign.builder()
                 .decoder(new JacksonDecoder(objectMapper))
                 .encoder(new JacksonEncoder(objectMapper))
@@ -64,7 +62,7 @@ public class ServiceLocator {
     /**
      * Constructs an API interface, using the admin port, for remote http calls with Feign.
      */
-    public <T> T buildAdmin(InstanceMetadata instanceMetadata, Class<T> clazz) throws ServiceCallException {
+    public <T> T buildAdmin(InstanceMetadata instanceMetadata, Class<T> clazz) {
         AdminPort adminPort = build(instanceMetadata, AdminPort.class);
         Integer port = adminPort.getAdminPort();
         return Feign.builder()
@@ -76,7 +74,7 @@ public class ServiceLocator {
     /**
      * Constructs an API interface, using the admin port, for remote http calls with Feign.
      */
-    public <T> T buildNoSerialize(InstanceMetadata instanceMetadata, Class<T> clazz) throws ServiceCallException {
+    public <T> T buildNoSerialize(InstanceMetadata instanceMetadata, Class<T> clazz) {
         return Feign.builder()
                 .target(clazz, getAdress(instanceMetadata));
     }
@@ -84,7 +82,7 @@ public class ServiceLocator {
     /**
      * Constructs an API interface, using the admin port, for remote http calls with Feign.
      */
-    public <T> T buildAdminNoSerialize(InstanceMetadata instanceMetadata, Class<T> clazz) throws ServiceCallException {
+    public <T> T buildAdminNoSerialize(InstanceMetadata instanceMetadata, Class<T> clazz) {
         AdminPort adminPort = build(instanceMetadata, AdminPort.class);
         Integer port = adminPort.getAdminPort();
         return Feign.builder()
@@ -171,7 +169,7 @@ public class ServiceLocator {
 
     }
 
-    private Integer counter(String servicename) {
+    private static Integer counter(String servicename) {
         Integer count = 0;
         if(roundRobin.containsKey(servicename)) {
             count = roundRobin.get(servicename);
@@ -185,7 +183,7 @@ public class ServiceLocator {
         return connections;
     }
 
-    public static void createInstance(ServiceDiscovery discovery, ObjectMapper objectMapper) {
+    public static void createInstance(ServiceDiscovery<InstanceMetadata> discovery, ObjectMapper objectMapper) {
         DEFAULTINSTANCE = new ServiceLocator();
         DEFAULTINSTANCE.discovery = discovery;
         DEFAULTINSTANCE.objectMapper = objectMapper;
@@ -198,7 +196,7 @@ public class ServiceLocator {
         return DEFAULTINSTANCE;
     }
 
-    public static ServiceLocator getInstance(ServiceDiscovery discovery, ObjectMapper objectMapper) {
+    public static ServiceLocator getInstance(ServiceDiscovery<InstanceMetadata> discovery, ObjectMapper objectMapper) {
         ServiceLocator serviceLocator = new ServiceLocator();
         serviceLocator.discovery = discovery;
         serviceLocator.objectMapper = objectMapper;

@@ -1,14 +1,15 @@
 package com.aegal.framework.core.auth.provider;
 
-import com.aegal.framework.core.auth.AuthConfig;
-import com.aegal.framework.core.auth.domain.AuthUser;
-import com.google.common.base.Optional;
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
+
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import com.aegal.framework.core.auth.domain.AuthUser;
+import com.google.common.base.Optional;
 
 /**
  * User: A.Egal
@@ -19,10 +20,8 @@ public class AuthProviderMock implements Authenticator<String, AuthUser> {
 
     private final Logger LOGGER = LoggerFactory.getLogger(AuthProviderMock.class);
 
-    private final AuthConfig authConfig;
 
-    public AuthProviderMock(AuthConfig authConfig) {
-        this.authConfig = authConfig;
+    public AuthProviderMock() {
     }
 
     @Override

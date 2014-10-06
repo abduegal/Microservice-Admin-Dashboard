@@ -7,6 +7,8 @@ package com.aegal.framework.core.exceptions;
  */
 public class ServiceCallException extends Exception implements MsException {
 
+    private static final long serialVersionUID = 1L;
+
     public ServiceCallException(Throwable cause) {
         super(cause);
     }
