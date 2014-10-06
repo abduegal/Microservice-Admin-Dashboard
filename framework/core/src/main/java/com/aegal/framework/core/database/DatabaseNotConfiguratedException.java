@@ -9,6 +9,8 @@ import com.aegal.framework.core.exceptions.MsException;
  */
 public class DatabaseNotConfiguratedException extends Exception implements MsException {
 
+    private static final long serialVersionUID = 1L;
+
     public DatabaseNotConfiguratedException(Throwable cause) {
         super(cause);
     }

@@ -7,6 +7,8 @@ package com.aegal.framework.core.exceptions;
  */
 public class GuardException extends RuntimeException implements MsException {
 
+    private static final long serialVersionUID = 1L;
+
     public GuardException(String message) {
         super(message);
     }

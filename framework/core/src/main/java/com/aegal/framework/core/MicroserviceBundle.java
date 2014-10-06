@@ -114,7 +114,7 @@ public class MicroserviceBundle<T extends MicroserviceConfig> implements
         allowOrigin(filterAdmin);
     }
 
-    private void allowOrigin(FilterRegistration.Dynamic filter) {
+    private static void allowOrigin(FilterRegistration.Dynamic filter) {
         filter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
         filter.setInitParameter("allowedOrigins", "*"); // allowed origins comma separated
         filter.setInitParameter("allowedHeaders", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin");
@@ -133,7 +133,7 @@ public class MicroserviceBundle<T extends MicroserviceConfig> implements
         }else{
             //for tests.
             environment.jersey().register(new ConditionalAuthProvider<>(
-                    new OAuthProvider<>(new AuthProviderMock(configuration.getAuthConfig()),
+                    new OAuthProvider<>(new AuthProviderMock(),
                             "secret"),
                     new MvelExpressionEvaluationMock<>(new MSVariableProvider())));
         }
@@ -155,7 +155,7 @@ public class MicroserviceBundle<T extends MicroserviceConfig> implements
         environment.healthChecks().unregister("curator");
     }
 
-    private void registerLogFileResource(MicroserviceConfig configuration, Environment environment) {
+    private static void registerLogFileResource(MicroserviceConfig configuration, Environment environment) {
         if (!configuration.isTest()) {
             environment.jersey().register(new LogFileResource(configuration));
         }
