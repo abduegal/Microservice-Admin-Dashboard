@@ -4,11 +4,18 @@ import com.aegal.framework.core.api.AdminPort;
 import com.aegal.framework.core.exceptions.ServiceCallException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
 import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
+
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceInstance;
+import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -20,6 +27,9 @@ import java.util.*;
  */
 public class ServiceLocator {
 
+    private static final Logger logger = LoggerFactory
+	    .getLogger(ServiceLocator.class);
+    
     /**
      * Very easy round-robin like implementation.
      */
@@ -115,7 +125,10 @@ public class ServiceLocator {
                 result.addAll(instances(service));
             }
             return result;
-        } catch (Exception e) {
+        }catch(NoNodeException nne){
+            logger.info("No nodes found. Details: " + nne.getMessage());
+            return Collections.emptyList();
+        }catch (Exception e) {
             throw new ServiceCallException(e);
         }
     }
@@ -133,6 +146,9 @@ public class ServiceLocator {
             }
 
             return map;
+        }catch(NoNodeException nne){
+            logger.info("No nodes found. Details: " + nne.getMessage());
+            return Collections.emptyMap();
         } catch (Exception e) {
             throw new ServiceCallException(e);
         }
