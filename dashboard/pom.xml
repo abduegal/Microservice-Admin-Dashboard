@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.aegal</groupId>
+    <groupId>com.github.abduegal</groupId>
     <artifactId>dashboard</artifactId>
     <version>0.8</version>
 
@@ -14,9 +14,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.aegal</groupId>
+            <groupId>com.github.abduegal</groupId>
             <artifactId>microservice-framework-core</artifactId>
-            <version>0.8</version>
+            <version>0.8-snapshot</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
