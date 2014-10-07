@@ -31,7 +31,7 @@
            <th rowspan="{{values.length}}">{{gaugetype}}</th>
            <td>
           <span data-ng-repeat="(key, value) in values">
-            {{key}}: <strong>{{value.value |  number:0}}</strong><br/>
+            {{key}}: <strong>{{value.value |  textOrNumber:1}}</strong><br/>
           </span>
            </td>
          </tr>
