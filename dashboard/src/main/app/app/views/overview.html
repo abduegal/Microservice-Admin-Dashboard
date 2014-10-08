@@ -88,6 +88,14 @@
       <table class="table">
         <tr><td>Servicename:</td> <th>{{model.data.name}}</th></tr>
         <tr><td>Location:</td> <th>{{model.data.location}}</th></tr>
+          <tr><td>Ping:</td>
+              <th>
+                  <span data-ng-show="model.data.ping" class="label label-success">Success</span>
+            <span data-ng-hide="model.data.ping" class="label label-danger">
+              Failed
+            </span>
+              </th>
+          </tr>
         <tr><td>Healthchecks:</td>
           <th>
             <span data-ng-show="model.data.healthcheck" class="label label-success">Success</span>
@@ -97,14 +105,8 @@
             <a href data-ng-click="doHealthCheck(model.data)">Rerun</a>
           </th>
         </tr>
-        <tr><td>Ping:</td>
-          <th>
-            <span data-ng-show="model.data.ping" class="label label-success">Success</span>
-            <span data-ng-hide="model.data.ping" class="label label-danger">
-              Failed
-            </span>
-          </th>
-        </tr>
+          <tr><td>Details:</td>
+              <pre>{{model.data.healthcheckDetails}}</pre>
       </table>
 
     </div>

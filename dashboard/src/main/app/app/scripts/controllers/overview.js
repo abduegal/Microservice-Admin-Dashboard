@@ -42,29 +42,30 @@ angular.module('adminDashboardApp')
     }
 
     $scope.doHealthCheck = function(data){
-      $scope.model.healthcheck = undefined;
-      OverviewSrv.getHealthcheck(data.data).then(
-        function success(){
-          $scope.model.data.healthcheck = true;
-        },
-        function error(){
-          $scope.model.data.healthcheck = false;
-        }
-      );
+        $scope.model.healthcheck = undefined;
+        OverviewSrv.getHealthcheck(data.data).then(
+            function success(response){
+                var stringify = JSON.stringify(response.healthCheckResponse,null,2);
+                $scope.model.data.healthcheckDetails = stringify;
+                $scope.model.data.healthcheck = !stringify.indexOf('"healthy": false')>0;
+            }
+        );
     }
 
     $scope.allHealthChecks = function(){
-      $scope.healtchecksToggled = true;
-      _.each($scope.model.services, function(service) {
-        OverviewSrv.getHealthcheck(service.data).then(
-          function success(){
-            $('#' + service.data.instanceId + ' circle').css("fill", '#449d44');
-          },
-          function error(){
-            $('#' + service.data.instanceId + ' circle').css("fill", '#c81f08');
-          }
-        );
-      })
+        $scope.healtchecksToggled = true;
+        _.each($scope.model.services, function(service) {
+            OverviewSrv.getHealthcheck(service.data).then(
+                function success(data){
+                    var stringify = JSON.stringify(data,null,2);
+                    if(stringify.indexOf('"healthy": false')>0){
+                        $('#' + service.data.instanceId + ' circle').css("fill", '#c81f08');
+                    }else{
+                        $('#' + service.data.instanceId + ' circle').css("fill", '#449d44');
+                    }
+                }
+            );
+        })
     }
 
     $scope.undoHealtChecksColors = function(){
