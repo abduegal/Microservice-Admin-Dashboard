@@ -6,10 +6,18 @@ import com.aegal.frontend.dto.D3GraphDTO;
 import com.aegal.frontend.srv.GraphDataGenerator;
 import com.aegal.frontend.srv.NamespacesManager;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
+
+import feign.FeignException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.StreamingOutput;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -24,6 +32,10 @@ import java.util.List;
 @Path("/overview/{namespace}")
 public class OverviewResource {
 
+    
+    private static final Logger logger = LoggerFactory
+	    .getLogger(OverviewResource.class);
+    
     private NamespacesManager namespacesManager;
 
     public OverviewResource(NamespacesManager namespacesManager) {
@@ -40,8 +52,32 @@ public class OverviewResource {
     @Path("healthcheck")
     @Consumes("application/json")
     public JsonNode healthcheck(@PathParam("namespace") String ns, InstanceMetadata serviceInstance) throws
-            Exception {
-        return namespacesManager.getServiceLocator(ns).buildAdmin(serviceInstance, AdminMetrics.class).healthcheck();
+    Exception {
+
+	ObjectNode parentNode = new ObjectMapper().createObjectNode();
+	try{
+	    JsonNode healthcheck = namespacesManager.getServiceLocator(ns).buildAdmin(serviceInstance, AdminMetrics.class).healthcheck();
+	    parentNode.set("healthCheckResponse", healthcheck);
+	    return parentNode;
+	}catch(FeignException e){
+	    if(logger.isDebugEnabled()){
+		logger.debug("FainException while getting healthcheck information. This normally means only a 500 status because of unhealthy service. Details: " +  e.getMessage());
+	    }
+	    
+	    //try to parse the json body from the error message.
+	    //seems to be the only way to the body of a 500 response
+	    String msg = e.getMessage();
+	    String feignBodyPrefix = "; content:";
+
+	    if(msg.indexOf(feignBodyPrefix)>0){
+		String jsonHealthResponse = msg.substring(msg.indexOf(feignBodyPrefix) + feignBodyPrefix.length());
+		parentNode.set("healthCheckResponse", new ObjectMapper().readTree(jsonHealthResponse));
+		return parentNode;
+	    }else{
+		logger.error("FainException while getting healthcheck information. Unable to parse the healt hcheck result from the message: " + e.getMessage());
+		throw e;  
+	    }
+	}
     }
 
     @POST
