@@ -53,7 +53,7 @@ angular
 angular.module('filters', []).
 filter('textOrNumber', function ($filter) {
     return function (input, fractionSize) {
-        if (isNaN(input)) {
+        if (isNaN(input) || input % 1 == 0) {
             return input;
         } else {
             return $filter('number')(input, fractionSize);

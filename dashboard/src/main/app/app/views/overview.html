@@ -1,6 +1,6 @@
 <h2>Services Graph</h2>
 
-<p>Add more application by editing the <code>discover.namespace</code> in your config.yml. </p>
+<p>Add more applications by editing the <code>discovery.namespace</code> in your config.yml. </p>
 
 <div class="col-md-9">
   <!-- Nav tabs -->
@@ -31,7 +31,7 @@
            <th rowspan="{{values.length}}">{{gaugetype}}</th>
            <td>
           <span data-ng-repeat="(key, value) in values">
-            {{key}}: <strong>{{value.value |  textOrNumber:1}}</strong><br/>
+            {{key}}: <strong>{{value.value |  textOrNumber:2}}</strong><br/>
           </span>
            </td>
          </tr>
@@ -106,7 +106,10 @@
           </th>
         </tr>
           <tr><td>Details:</td>
+          <th>
               <pre>{{model.data.healthcheckDetails}}</pre>
+           </th>
+        </tr>
       </table>
 
     </div>
