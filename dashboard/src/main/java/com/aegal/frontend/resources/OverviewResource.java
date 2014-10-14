@@ -1,20 +1,28 @@
 package com.aegal.frontend.resources;
 
+import com.aegal.framework.core.ServiceLocator;
 import com.aegal.framework.core.api.AdminMetrics;
 import com.aegal.framework.core.api.LogFile;
+import com.aegal.frontend.FrontendConfig;
 import com.aegal.frontend.dto.D3GraphDTO;
 import com.aegal.frontend.srv.GraphDataGenerator;
 import com.aegal.frontend.srv.NamespacesManager;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
+import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
 
 import feign.FeignException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.StreamingOutput;
 
+import org.apache.curator.x.discovery.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,6 +93,82 @@ public class OverviewResource {
     @Consumes("application/json")
     public JsonNode findMetrics(@PathParam("namespace") String ns, InstanceMetadata serviceInstance) throws Exception {
         return namespacesManager.getServiceLocator(ns).buildAdmin(serviceInstance, AdminMetrics.class).metrics();
+    }
+    
+    /**
+     * A method to display values of a given metric field name for all known services.
+     *
+     * @param ns the namespace as it is configured in {@link FrontendConfig#getNamespaces()}.
+     * @param filter the filter is the name of the property key. No wildcards are allowed only exact matches. 
+     * @return the filter result. Example call and result:
+     * 
+     * <pre>http://yourserver:andPort/api/overview/{namespace}/metric-filter?filter=jvm.threads.runnable.count,org.apache.http.conn.ClientConnectionManager.Client.pending-connections</pre>
+     * 
+     * <pre>{
+    "filterResult": [
+        {
+            "service": {
+                "name": "myService1",
+                "baseUrl": "http://10.10.130.195:8091"
+            },
+            "metrics": {
+                "jvm.threads.runnable.count": {
+                    "value": 24
+                },
+                "org.apache.http.conn.ClientConnectionManager.Client.pending-connections": null
+            }
+        },
+        {
+            "service": {
+                "name": "myService2",
+                "baseUrl": "http://10.10.230.195:8082"
+            },
+            "metrics": {
+                "jvm.threads.runnable.count": {
+                    "value": 25
+                },
+                "org.apache.http.conn.ClientConnectionManager.Client.pending-connections": {
+                    "value": 0
+                }
+            }
+        }
+    ]
+}</pre>
+     * 
+     * @throws Exception the exception in case of any problems
+     */
+    @GET
+    @Path("metric-filter")
+    @Produces("application/json")
+    public JsonNode filterMetrics(@PathParam("namespace") String ns , @QueryParam("filter") String filter) throws Exception {
+	
+	ObjectMapper mapper = new ObjectMapper();
+	ArrayNode arrayNode = mapper.createArrayNode();
+	
+	ServiceLocator serviceLocator = namespacesManager.getServiceLocator(ns);
+	for(ServiceInstance<InstanceMetadata> s : serviceLocator.allInstances()){
+            
+	    ObjectNode resultNode = mapper.createObjectNode();
+	    //set service node
+	    ObjectNode serviceNode = mapper.createObjectNode();
+	    serviceNode.set("name", TextNode.valueOf(s.getName()));
+	    boolean sslAvailable = s.getSslPort()!=null && s.getSslPort()>0;
+	    serviceNode.set("baseUrl", TextNode.valueOf((sslAvailable?"https":"http") + "://" + s.getAddress() + ":" + (sslAvailable?s.getSslPort():s.getPort())));
+	    resultNode.set("service",serviceNode);
+	    
+	    //get metrics node with subnotes named like filter parts
+	    JsonNode metrics = namespacesManager.getServiceLocator(ns).buildAdmin(s.getPayload(), AdminMetrics.class).metrics();
+	    ObjectNode metricsNode = mapper.createObjectNode();
+	    
+	    for (String filterPart : Splitter.on(',').omitEmptyStrings().trimResults().splitToList(filter)) {
+		JsonNode filterResult = metrics.findValue(filterPart);
+		metricsNode.set(filterPart, Objects.firstNonNull(filterResult, MissingNode.getInstance()));
+	    }
+	    
+	    resultNode.set("metrics", metricsNode );
+            arrayNode.add(resultNode);
+        }
+	return mapper.createObjectNode().set("filterResult", arrayNode);
     }
 
     @POST
