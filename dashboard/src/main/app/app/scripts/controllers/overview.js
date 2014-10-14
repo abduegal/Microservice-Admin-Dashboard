@@ -41,13 +41,21 @@ angular.module('adminDashboardApp')
       $scope.doPing(data);
     }
 
+    function isHealthy(healthDetailsAsString){
+    	return healthDetailsAsString.indexOf('"healthy": false')==-1;
+    }
+    
+    function stringify(response){
+    	return JSON.stringify(response.healthCheckResponse,null,2);
+    }
+    
     $scope.doHealthCheck = function(data){
         $scope.model.healthcheck = undefined;
         OverviewSrv.getHealthcheck(data.data).then(
             function success(response){
-                var stringify = JSON.stringify(response.healthCheckResponse,null,2);
-                $scope.model.data.healthcheckDetails = stringify;
-                $scope.model.data.healthcheck = !stringify.indexOf('"healthy": false')>0;
+                var healthDetailsAsString = stringify(response);
+                $scope.model.data.healthcheckDetails = healthDetailsAsString;
+                $scope.model.data.healthcheck = isHealthy(healthDetailsAsString);
             }
         );
     }
@@ -56,13 +64,16 @@ angular.module('adminDashboardApp')
         $scope.healtchecksToggled = true;
         _.each($scope.model.services, function(service) {
             OverviewSrv.getHealthcheck(service.data).then(
-                function success(data){
-                    var stringify = JSON.stringify(data,null,2);
-                    if(stringify.indexOf('"healthy": false')>0){
-                        $('#' + service.data.instanceId + ' circle').css("fill", '#c81f08');
+                function success(response){
+                	var healthDetailsAsString = stringify(response);
+                	
+                	var colorCode;
+                	if(isHealthy(healthDetailsAsString)){
+                    	 colorCode = '#449d44'; //green
                     }else{
-                        $('#' + service.data.instanceId + ' circle').css("fill", '#449d44');
+                    	colorCode = '#c81f08'; //red
                     }
+                    $('#' + service.data.instanceId + ' circle').css("fill", colorCode);
                 }
             );
         })
