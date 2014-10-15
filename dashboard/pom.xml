@@ -6,7 +6,7 @@
 
     <groupId>com.github.abduegal</groupId>
     <artifactId>dashboard</artifactId>
-    <version>0.8</version>
+    <version>0.8.1-SNAPSHOT</version>
 
     <properties>
         <dropwizard.version>0.7.0-rc2</dropwizard.version>
@@ -16,7 +16,7 @@
         <dependency>
             <groupId>com.github.abduegal</groupId>
             <artifactId>microservice-framework-core</artifactId>
-            <version>0.8-snapshot</version>
+            <version>0.8.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -30,8 +30,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>

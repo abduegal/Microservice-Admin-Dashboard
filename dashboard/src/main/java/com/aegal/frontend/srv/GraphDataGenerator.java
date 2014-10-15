@@ -2,6 +2,7 @@ package com.aegal.frontend.srv;
 
 import com.aegal.framework.core.ServiceLocator;
 import com.aegal.framework.core.api.Connections;
+import com.aegal.framework.core.exceptions.ServiceCallException;
 import com.aegal.framework.core.util.Guard;
 import com.aegal.frontend.DependencyKeys;
 import com.aegal.frontend.dto.D3GraphDTO;
@@ -57,8 +58,9 @@ public class GraphDataGenerator extends TenacityCommand<List<D3GraphDTO<Instance
 
     }
 
-    private void buildGraphDto(D3GraphDTO<InstanceMetadata> graphDTO, ServiceInstance<InstanceMetadata> instance, String servicename,
-                               Map<String, Collection<ServiceInstance<InstanceMetadata>>> instances) {
+    private void buildGraphDto(final D3GraphDTO<InstanceMetadata> graphDTO,
+                               final ServiceInstance<InstanceMetadata> instance, String servicename,
+                               final Map<String, Collection<ServiceInstance<InstanceMetadata>>> instances) throws ServiceCallException {
 
         graphDTO.id = instance.getPayload().getInstanceId().toString();
         graphDTO.group = groupForServiceName(servicename);

@@ -7,7 +7,7 @@
     <groupId>com.github.abduegal</groupId>
     <artifactId>microservice-framework</artifactId>
     <packaging>pom</packaging>
-    <version>0.8-snapshot</version>
+    <version>0.8.1-SNAPSHOT</version>
     <modules>
         <module>core</module>
     </modules>
@@ -158,8 +158,8 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
