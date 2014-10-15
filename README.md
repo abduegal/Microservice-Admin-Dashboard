@@ -167,15 +167,15 @@ Building the dashboard:
 
 The dashboard is build with Dropwizard (backend) and AngularJS (with grunt). The Angular front-end is packaged with
 the dashboard as static resource, but you can also run it seperately by navigating to the 'app' directory with grunt
-using the following commands:
-```npm install  ```
-```bower install```
+using the following commands:  
+```npm install  ```  
+```bower install```  
 
-To run it locally:
-```grunt serve```
+To run it locally:  
+```grunt serve```  
 
-To build it:
-```grunt build```
+To build it:  
+```grunt build```  
 It will automatically copy the processed front-end files to the 'src/main/resources/static' directory. You can
 optionally use the --force command if it complaints about permission problems like:
  - Cannot delete files outside the current working directory. Use --force to continue.
