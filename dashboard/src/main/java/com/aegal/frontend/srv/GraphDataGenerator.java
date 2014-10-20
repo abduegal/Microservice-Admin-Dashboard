@@ -8,15 +8,12 @@ import com.aegal.frontend.DependencyKeys;
 import com.aegal.frontend.dto.D3GraphDTO;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.yammer.tenacity.core.TenacityCommand;
-
 import feign.FeignException;
-
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.WebApplicationException;
-
 import java.util.*;
 
 /**
@@ -43,8 +40,7 @@ public class GraphDataGenerator extends TenacityCommand<List<D3GraphDTO<Instance
 
         List<D3GraphDTO<InstanceMetadata>> result = new ArrayList<>();
 
-        Map<String, Collection<ServiceInstance<InstanceMetadata>>> instances =
-                serviceLocator.allInstancesMap();
+        Map<String, Collection<ServiceInstance<InstanceMetadata>>> instances = serviceLocator.allInstancesMap();
         for (String servicename : instances.keySet()) {
             for (ServiceInstance<InstanceMetadata> instance : instances.get(servicename)) {
                 D3GraphDTO<InstanceMetadata> graphDTO = new D3GraphDTO<InstanceMetadata>();
@@ -73,7 +69,7 @@ public class GraphDataGenerator extends TenacityCommand<List<D3GraphDTO<Instance
 
             List<InstanceMetadata> instanceMetadatas =
                     serviceLocator.build(instance.getPayload(), Connections.class).getConnections();
-            graphDTO.links = instanceMetadatas;
+            graphDTO.links = instanceMetadatas != null ? instanceMetadatas : new ArrayList<InstanceMetadata>();
 
         } catch (WebApplicationException | FeignException e) {
             logger.error("Error while building the d3 graph: " + e.getMessage());

@@ -203,4 +203,7 @@ public class ServiceLocator {
         return serviceLocator;
     }
 
+    public ServiceDiscovery<InstanceMetadata> getServiceDiscovery() {
+        return discovery;
+    }
 }

@@ -1,12 +1,11 @@
 package com.aegal.frontend.resources;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.StreamingOutput;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.StreamingOutput;
 
 /**
  * Deploys new applications. User: A.Egal Date: 8/14/14 Time: 10:21 PM

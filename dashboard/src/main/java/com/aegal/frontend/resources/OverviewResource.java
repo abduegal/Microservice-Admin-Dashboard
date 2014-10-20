@@ -7,6 +7,7 @@ import com.aegal.frontend.FrontendConfig;
 import com.aegal.frontend.dto.D3GraphDTO;
 import com.aegal.frontend.srv.GraphDataGenerator;
 import com.aegal.frontend.srv.NamespacesManager;
+import com.aegal.frontend.srv.ReadLogFileCommand;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -16,20 +17,12 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
-
 import feign.FeignException;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.StreamingOutput;
-
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.ws.rs.*;
 import java.util.List;
 
 /**
@@ -178,41 +171,7 @@ public class OverviewResource {
                                                  final InstanceMetadata serviceInstance) throws Exception {
         final String logfile =
                 namespacesManager.getServiceLocator(ns).buildNoSerialize(serviceInstance, LogFile.class).getLogFile();
-
-        StreamingOutput stream = new StreamingOutput() {
-            @Override
-            public void write(OutputStream outputStream) throws IOException, WebApplicationException {
-
-                String[] buffer = new String[lines];
-
-                BufferedReader br = null;
-                try {
-                    br = new BufferedReader(new FileReader(logfile));
-                    char suffix = '\n';
-
-                    int bufferStartIndex = 0;
-                    for (String line; (line = br.readLine()) != null; ) {
-                        buffer[bufferStartIndex++ % buffer.length] = line + suffix;
-                    }
-
-                    for (String s : buffer) {
-                        outputStream.write(s.getBytes());
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (br != null) br.close();
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        };
-
-        return javax.ws.rs.core.Response.ok(stream).build();
-
+        return new ReadLogFileCommand(logfile, lines).execute();
     }
 
     @POST
