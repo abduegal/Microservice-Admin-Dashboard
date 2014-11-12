@@ -1,43 +1,34 @@
-package com.aegal.frontend.srv;
+package com.aegal.frontend.commands;
 
 import com.aegal.framework.core.ServiceLocator;
 import com.aegal.framework.core.api.Connections;
 import com.aegal.framework.core.exceptions.ServiceCallException;
-import com.aegal.framework.core.util.Guard;
 import com.aegal.frontend.DependencyKeys;
 import com.aegal.frontend.dto.D3GraphDTO;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.yammer.tenacity.core.TenacityCommand;
-import feign.FeignException;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.WebApplicationException;
 import java.util.*;
 
 /**
- * User: A.Egal
- * Date: 8/28/14
- * Time: 9:09 PM
+ * Created by vagrant on 11/12/14.
  */
-public class GraphDataGenerator extends TenacityCommand<List<D3GraphDTO<InstanceMetadata>>> {
+public class BuildGraphServiceCommand extends TenacityCommand<List<D3GraphDTO<InstanceMetadata>>> {
 
-    private static final Logger logger = LoggerFactory
-	    .getLogger(GraphDataGenerator.class);
-    
+    private static final Logger logger = LoggerFactory.getLogger(BuildGraphServiceCommand.class);
     private final ServiceLocator serviceLocator;
     private static Map<String, Integer> serviceNameGroupId = new HashMap<>();
 
-    public GraphDataGenerator(ServiceLocator serviceLocator) {
-        super(DependencyKeys.DASHBOARD_FIND_SERVICES);
+    public BuildGraphServiceCommand(ServiceLocator serviceLocator) {
+        super(DependencyKeys.DASHBOARD_BUILD_GRAPH);
         this.serviceLocator = serviceLocator;
     }
 
     @Override
     protected List<D3GraphDTO<InstanceMetadata>> run() throws Exception {
-        Guard.notNull(serviceLocator);
-
         List<D3GraphDTO<InstanceMetadata>> result = new ArrayList<>();
 
         Map<String, Collection<ServiceInstance<InstanceMetadata>>> instances = serviceLocator.allInstancesMap();
@@ -51,7 +42,6 @@ public class GraphDataGenerator extends TenacityCommand<List<D3GraphDTO<Instance
             }
         }
         return result;
-
     }
 
     private void buildGraphDto(final D3GraphDTO<InstanceMetadata> graphDTO,
@@ -65,15 +55,7 @@ public class GraphDataGenerator extends TenacityCommand<List<D3GraphDTO<Instance
         graphDTO.size = 10 + 30 / instances.get(servicename).size();
         graphDTO.data = instance.getPayload();
 
-        try {
-
-            List<InstanceMetadata> instanceMetadatas =
-                    serviceLocator.build(instance.getPayload(), Connections.class).getConnections();
-            graphDTO.links = instanceMetadatas != null ? instanceMetadatas : new ArrayList<InstanceMetadata>();
-
-        } catch (WebApplicationException | FeignException e) {
-            logger.error("Error while building the d3 graph: " + e.getMessage());
-        }
+        graphDTO.links = new AddConnectionInformationCommand(instance).execute();
 
     }
 
@@ -84,6 +66,26 @@ public class GraphDataGenerator extends TenacityCommand<List<D3GraphDTO<Instance
             serviceNameGroupId.put(serviceName, id);
         }
         return id;
+    }
+
+    protected class AddConnectionInformationCommand extends TenacityCommand<List<InstanceMetadata>> {
+        private final ServiceInstance<InstanceMetadata> instance;
+
+        public AddConnectionInformationCommand(final ServiceInstance<InstanceMetadata> instance) {
+            super(DependencyKeys.DASHBOARD_FIND_CONNECTIONS);
+            this.instance = instance;
+        }
+
+        @Override
+        protected List<InstanceMetadata> run() throws Exception {
+            return serviceLocator.build(instance.getPayload(), Connections.class).getConnections();
+        }
+
+        @Override
+        protected List<InstanceMetadata> getFallback() {
+            logger.error("Error while building the d3 graph: ");
+            return new ArrayList<>();
+        }
     }
 
 }

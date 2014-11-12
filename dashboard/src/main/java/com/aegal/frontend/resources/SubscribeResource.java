@@ -25,10 +25,11 @@ public class SubscribeResource {
     /**
      * Enables other services to subscribe.
      * You must repeat calling this resource before the TTL limit expires.
+     *
      * @param servicename the servicename
-     * @param address the location of the service I.E. http://192.168.1.2
-     * @param port I.E. 1234
-     * @param timeToLive time to live in seconds (default 120 seconds)
+     * @param address     the location of the service I.E. http://192.168.1.2
+     * @param port        I.E. 1234
+     * @param timeToLive  time to live in seconds (default 120 seconds)
      * @return "ok" or "failure"
      */
     @POST

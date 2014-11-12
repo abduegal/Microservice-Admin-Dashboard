@@ -35,7 +35,7 @@ public class SystemResource {
     @GET
     @Path("info")
     @Produces("application/json")
-    public SystemValues getSystemResourceValues(){
+    public SystemValues getSystemResourceValues() {
         SystemValues systemValues = new SystemValues();
 
         systemValues.availableProcessors = Runtime.getRuntime().availableProcessors();

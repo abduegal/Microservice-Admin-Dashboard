@@ -53,9 +53,13 @@ angular.module('adminDashboardApp')
         $scope.model.healthcheck = undefined;
         OverviewSrv.getHealthcheck(data.data).then(
             function success(response){
+              $scope.healthcheckAvailable = response.didRun;
+              if($scope.healthcheckAvailable) {
+
                 var healthDetailsAsString = stringify(response);
                 $scope.model.data.healthcheckDetails = healthDetailsAsString;
                 $scope.model.data.healthcheck = isHealthy(healthDetailsAsString);
+              }
             }
         );
     }
@@ -68,7 +72,7 @@ angular.module('adminDashboardApp')
                 	var healthDetailsAsString = stringify(response);
                 	
                 	var colorCode;
-                	if(isHealthy(healthDetailsAsString)){
+                	if(isHealthy(healthDetailsAsString) && response.didRun){
                     	 colorCode = '#449d44'; //green
                     }else{
                     	colorCode = '#c81f08'; //red
@@ -92,12 +96,14 @@ angular.module('adminDashboardApp')
       OverviewSrv.getMetrics(data.data).then(
 
         function success(data){
-          $scope.model.data.metrics = data;
-          $scope.model.data.gauges = $scope.buildGauges(data);
-          $scope.model.data.timers = $scope.replaceDotsInKeys(data.timers);
-          $scope.model.data.counters = $scope.replaceDotsInKeys(data.counters);
-          $scope.model.data.meters = $scope.replaceDotsInKeys(data.meters);
-
+          $scope.metricsAvailable = data.didRun;
+          if($scope.metricsAvailable) {
+            $scope.model.data.metrics = data.node;
+            $scope.model.data.gauges = $scope.buildGauges(data.node);
+            $scope.model.data.timers = $scope.replaceDotsInKeys(data.node.timers);
+            $scope.model.data.counters = $scope.replaceDotsInKeys(data.node.counters);
+            $scope.model.data.meters = $scope.replaceDotsInKeys(data.node.meters);
+          }
         }
       );
     };

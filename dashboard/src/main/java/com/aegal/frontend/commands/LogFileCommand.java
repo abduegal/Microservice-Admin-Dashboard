@@ -1,6 +1,9 @@
-package com.aegal.frontend.srv;
+package com.aegal.frontend.commands;
 
+import com.aegal.framework.core.api.LogFile;
 import com.aegal.frontend.DependencyKeys;
+import com.aegal.frontend.srv.NamespacesManager;
+import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.yammer.tenacity.core.TenacityCommand;
 
 import javax.ws.rs.WebApplicationException;
@@ -12,22 +15,43 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Reads the logfile and converts it into a Stream output.
- * Created by vagrant on 10/20/14.
+ * Reads the logfile for the selected service and converts the response.
+ * Created by vagrant on 11/12/14.
  */
-public class ReadLogFileCommand extends TenacityCommand<Response> {
+public class LogFileCommand extends TenacityCommand<Response> {
 
-    private final String logfile;
-    private final int lines;
+    private final String ns;
+    private final Integer lines;
+    private final InstanceMetadata serviceInstance;
+    private final NamespacesManager namespacesManager;
 
-    public ReadLogFileCommand(String logfile, int lines) {
+    public LogFileCommand(final String ns,
+                          final Integer lines,
+                          final InstanceMetadata serviceInstance,
+                          final NamespacesManager namespacesManager) {
+
         super(DependencyKeys.DASHBOARD_READ_LOGFILE);
-        this.logfile = logfile;
+        this.ns = ns;
         this.lines = lines;
+        this.serviceInstance = serviceInstance;
+        this.namespacesManager = namespacesManager;
     }
 
     @Override
     protected Response run() throws Exception {
+        String logFile = namespacesManager.getServiceLocator(ns).buildNoSerialize(serviceInstance, LogFile.class).getLogFile();
+        return readLogFiles(logFile);
+    }
+
+    @Override
+    protected Response getFallback() {
+        return Response.ok("Unable to read the logs").build();
+    }
+
+    /**
+     * Tries to read the logfile.
+     */
+    private Response readLogFiles(final String logfile) {
         StreamingOutput stream = new StreamingOutput() {
             @Override
             public void write(OutputStream outputStream) throws IOException, WebApplicationException {

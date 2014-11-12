@@ -33,7 +33,7 @@ public class NamespacesManager {
         build(environment);
     }
 
-    private void build(Environment environment){
+    private void build(Environment environment) {
         final JacksonInstanceSerializer<InstanceMetadata> serializer = new JacksonInstanceSerializer<InstanceMetadata>(
                 environment.getObjectMapper(), new TypeReference<ServiceInstance<InstanceMetadata>>() {
         });

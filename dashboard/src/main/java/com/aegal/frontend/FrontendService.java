@@ -23,7 +23,7 @@ public class FrontendService extends Application<FrontendConfig> {
 
     private MicroserviceBundle<? super FrontendConfig> microserviceBundle;
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         new FrontendService().run(args);
     }
 

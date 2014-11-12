@@ -9,7 +9,7 @@ import java.util.List;
  * Date: 8/10/14
  * Time: 4:20 PM
  */
-public class D3GraphDTO<T> implements Serializable{
+public class D3GraphDTO<T> implements Serializable {
 
     public String id;
     public int group;

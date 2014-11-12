@@ -15,16 +15,20 @@
 
 
  <div class="col-md-3">
+
    <!-- Nav tabs -->
-   <ul class="nav nav-tabs" role="tablist">
+   <ul class="nav nav-tabs" role="tablist" ng-show="metricsAvailable" >
      <li class="active"><a href data-target="#gauges" role="tab" data-toggle="tab">Gauges</a></li>
      <li><a href data-target="#timers" role="tab" data-toggle="tab">Timers</a></li>
      <li><a href data-target="#counters" role="tab" data-toggle="tab">Counters</a></li>
      <li><a href data-target="#meters" role="tab" data-toggle="tab">Meters</a></li>
    </ul>
 
+
+   <div class="alert alert-warning" ng-show="!metricsAvailable" role="alert">Metrics not found for this service</div>
+
    <!-- Tab panes -->
-   <div class="tab-content sideoverview">
+   <div class="tab-content sideoverview" ng-show="metricsAvailable" >
      <div class="tab-pane active" id="gauges">
        <table class="table table-bordered">
          <tr data-ng-repeat="(gaugetype, values) in model.data.gauges">
@@ -88,24 +92,25 @@
       <table class="table">
         <tr><td>Servicename:</td> <th>{{model.data.name}}</th></tr>
         <tr><td>Location:</td> <th>{{model.data.location}}</th></tr>
-          <tr><td>Ping:</td>
-              <th>
-                  <span data-ng-show="model.data.ping" class="label label-success">Success</span>
-            <span data-ng-hide="model.data.ping" class="label label-danger">
-              Failed
-            </span>
-              </th>
-          </tr>
-        <tr><td>Healthchecks:</td>
+        <tr><td>Ping:</td>
           <th>
+              <span data-ng-show="model.data.ping" class="label label-success">Success</span>
+              <span data-ng-hide="model.data.ping" class="label label-danger">
+                 Failed
+              </span>
+          </th>
+        </tr>
+        <tr><td>Healthchecks:</td>
+          <th data-ng-show="healthcheckAvailable">
             <span data-ng-show="model.data.healthcheck" class="label label-success">Success</span>
             <span data-ng-hide="model.data.healthcheck" class="label label-danger">
               Failed
             </span>
             <a href data-ng-click="doHealthCheck(model.data)">Rerun</a>
           </th>
+          <th data-ng-hide="healthcheckAvailable">Unavailable</th>
         </tr>
-          <tr><td>Details:</td>
+          <tr data-ng-show="healthcheckAvailable"><td>Details:</td>
           <th>
               <pre>{{model.data.healthcheckDetails}}</pre>
            </th>
