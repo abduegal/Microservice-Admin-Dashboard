@@ -5,10 +5,6 @@ import com.aegal.framework.core.exceptions.ServiceCallException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ge.snowizard.discovery.core.InstanceMetadata;
 
-import feign.Feign;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.zookeeper.KeeperException.NoNodeException;
@@ -43,20 +39,14 @@ public class ServiceLocator {
      */
     public <T> T build(String servicename, Class<T> clazz) throws ServiceCallException {
         ServiceInstance<InstanceMetadata> instance = pickRandomService(servicename);
-        return Feign.builder()
-                .decoder(new JacksonDecoder(objectMapper))
-                .encoder(new JacksonEncoder(objectMapper))
-                .target(clazz, getAdress(instance.getPayload()));
+        return new FeignBuilder(objectMapper).build(getAdress(instance.getPayload()), clazz);
     }
 
     /**
      * Constructs an API interface, for remote http calls with Feign.
      */
     public <T> T build(InstanceMetadata instanceMetadata, Class<T> clazz) {
-        return Feign.builder()
-                .decoder(new JacksonDecoder(objectMapper))
-                .encoder(new JacksonEncoder(objectMapper))
-                .target(clazz, getAdress(instanceMetadata));
+        return new FeignBuilder(objectMapper).build(getAdress(instanceMetadata), clazz);
     }
 
     /**
@@ -65,18 +55,14 @@ public class ServiceLocator {
     public <T> T buildAdmin(InstanceMetadata instanceMetadata, Class<T> clazz) {
         AdminPort adminPort = build(instanceMetadata, AdminPort.class);
         Integer port = adminPort.getAdminPort();
-        return Feign.builder()
-                .decoder(new JacksonDecoder(objectMapper))
-                .encoder(new JacksonEncoder(objectMapper))
-                .target(clazz, getAdress(instanceMetadata, port));
+        return new FeignBuilder(objectMapper).build(getAdress(instanceMetadata, port), clazz);
     }
 
     /**
      * Constructs an API interface, using the admin port, for remote http calls with Feign.
      */
     public <T> T buildNoSerialize(InstanceMetadata instanceMetadata, Class<T> clazz) {
-        return Feign.builder()
-                .target(clazz, getAdress(instanceMetadata));
+        return new FeignBuilder(objectMapper, false).build(getAdress(instanceMetadata), clazz);
     }
 
     /**
@@ -85,8 +71,7 @@ public class ServiceLocator {
     public <T> T buildAdminNoSerialize(InstanceMetadata instanceMetadata, Class<T> clazz) {
         AdminPort adminPort = build(instanceMetadata, AdminPort.class);
         Integer port = adminPort.getAdminPort();
-        return Feign.builder()
-                .target(clazz, getAdress(instanceMetadata, port));
+        return new FeignBuilder(objectMapper, false).build(getAdress(instanceMetadata, port), clazz);
     }
 
     protected String getAdress(InstanceMetadata instance){
@@ -157,6 +142,9 @@ public class ServiceLocator {
         try {
             ArrayList<ServiceInstance<InstanceMetadata>> instances
                     = new ArrayList<>(discovery.queryForInstances(servicename));
+            if (instances.size() == 0) {
+                throw new IllegalArgumentException("no services found in zookeeper with name: "+ servicename);
+            }
 
             ServiceInstance<InstanceMetadata> instance = instances.get(counter(servicename) % instances.size());
 
