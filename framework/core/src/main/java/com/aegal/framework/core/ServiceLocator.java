@@ -1,17 +1,21 @@
 package com.aegal.framework.core;
 
-import com.aegal.framework.core.api.AdminPort;
-import com.aegal.framework.core.exceptions.ServiceCallException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ge.snowizard.discovery.core.InstanceMetadata;
 
+import com.aegal.framework.core.discovery.MicroserviceDiscoveryBundle;
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
+import com.aegal.framework.core.exceptions.ServiceCallException;
+import io.dropwizard.discovery.client.DiscoveryClient;
+import org.apache.curator.x.discovery.DownInstancePolicy;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceInstance;
-import org.apache.zookeeper.KeeperException.NoNodeException;
+import org.apache.curator.x.discovery.strategies.RoundRobinStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Helps locating services.
@@ -21,74 +25,77 @@ import java.util.*;
  */
 public class ServiceLocator {
 
-    private static final Logger logger = LoggerFactory
-	    .getLogger(ServiceLocator.class);
-    
-    /**
-     * Very easy round-robin like implementation.
-     */
-    private static Map<String, Integer> roundRobin = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(ServiceLocator.class);
+
     private static ServiceLocator DEFAULTINSTANCE;
-    private ServiceDiscovery<InstanceMetadata> discovery;
-    private ObjectMapper objectMapper;
+    private MicroserviceDiscoveryBundle discoveryBundle;
+    private ServiceDiscovery<MicroserviceMetaData> serviceDiscovery;
 
-    private List<InstanceMetadata> connections = new ArrayList<>();
+    public String find(String serviceName) throws ServiceCallException {
+        try {
 
-    /**
-     * Constructs an API interface, for remote http calls with Feign.
-     */
-    public <T> T build(String servicename, Class<T> clazz) throws ServiceCallException {
-        ServiceInstance<InstanceMetadata> instance = pickRandomService(servicename);
-        return new FeignBuilder(objectMapper).build(getAdress(instance.getPayload()), clazz);
+            DiscoveryClient discoveryClient = discoveryBundle.getDiscoveryClient(serviceName);
+            ServiceInstance instance = discoveryClient.getInstance();
+            return buildAddress(instance.getAddress(), instance.getPort());
+
+        } catch (Exception e) {
+            throw new ServiceCallException(e);
+        }
     }
 
-    /**
-     * Constructs an API interface, for remote http calls with Feign.
-     */
-    public <T> T build(InstanceMetadata instanceMetadata, Class<T> clazz) {
-        return new FeignBuilder(objectMapper).build(getAdress(instanceMetadata), clazz);
+    public String findAdmin(String serviceName) throws ServiceCallException {
+        try {
+
+            DiscoveryClient<MicroserviceMetaData> discoveryClient = discoveryBundle.getDiscoveryClient(serviceName);
+            ServiceInstance<MicroserviceMetaData> instance = discoveryClient.getInstance();
+            return buildAddress(instance.getAddress(), instance.getPayload().getAdminPort());
+
+
+        } catch (Exception e) {
+            throw new ServiceCallException(e);
+        }
     }
 
-    /**
-     * Constructs an API interface, using the admin port, for remote http calls with Feign.
-     */
-    public <T> T buildAdmin(InstanceMetadata instanceMetadata, Class<T> clazz) {
-        AdminPort adminPort = build(instanceMetadata, AdminPort.class);
-        Integer port = adminPort.getAdminPort();
-        return new FeignBuilder(objectMapper).build(getAdress(instanceMetadata, port), clazz);
+    public String find(String serviceName, String protocol) throws ServiceCallException {
+        try {
+
+            DiscoveryClient discoveryClient = discoveryBundle.getDiscoveryClient(serviceName);
+            ServiceInstance instance = discoveryClient.getInstance();
+            return buildAddress(protocol, instance.getAddress(), instance.getPort());
+
+        } catch (Exception e) {
+            throw new ServiceCallException(e);
+        }
     }
 
-    /**
-     * Constructs an API interface, using the admin port, for remote http calls with Feign.
-     */
-    public <T> T buildNoSerialize(InstanceMetadata instanceMetadata, Class<T> clazz) {
-        return new FeignBuilder(objectMapper, false).build(getAdress(instanceMetadata), clazz);
+    public String findAdmin(String serviceName, String protocol) throws ServiceCallException {
+        try {
+
+            DiscoveryClient<MicroserviceMetaData> discoveryClient = discoveryBundle.getDiscoveryClient(serviceName);
+            ServiceInstance<MicroserviceMetaData> instance = discoveryClient.getInstance();
+            return buildAddress(protocol, instance.getAddress(), instance.getPayload().getAdminPort());
+        } catch (Exception e) {
+            throw new ServiceCallException(e);
+        }
     }
 
-    /**
-     * Constructs an API interface, using the admin port, for remote http calls with Feign.
-     */
-    public <T> T buildAdminNoSerialize(InstanceMetadata instanceMetadata, Class<T> clazz) {
-        AdminPort adminPort = build(instanceMetadata, AdminPort.class);
-        Integer port = adminPort.getAdminPort();
-        return new FeignBuilder(objectMapper, false).build(getAdress(instanceMetadata, port), clazz);
+    public String buildAddress(String protocol, String address, int port) {
+        return String.format("%s://%s:%s", protocol, address, port);
     }
 
-    protected String getAdress(InstanceMetadata instance){
-        return String.format("http://%s:%d", instance.getListenAddress(), instance.getListenPort());
+    public String buildAddress(String address, int port) {
+        return String.format("http://%s:%s", address, port);
     }
 
-    protected String getAdress(InstanceMetadata instance, Integer port){
-        return String.format("http://%s:%d", instance.getListenAddress(), port);
-    }
 
     /**
      * Returns all serviceinstances of the microservices with the given name.
      * @param servicename the servicename.
      */
-    public Collection<ServiceInstance<InstanceMetadata>> instances(String servicename) throws ServiceCallException {
+    public Collection<ServiceInstance<MicroserviceMetaData>> instances(String servicename) throws ServiceCallException {
         try {
-            return discovery.queryForInstances(servicename);
+            DiscoveryClient<MicroserviceMetaData> discoveryClient = discoveryBundle.getDiscoveryClient(servicename);
+            return discoveryClient.getInstances();
         } catch (Exception e) {
             throw new ServiceCallException(e);
         }
@@ -97,20 +104,17 @@ public class ServiceLocator {
     /**
      * Returns all serviceinstances of all microservices registered with zookeeper.
      */
-    public Collection<ServiceInstance<InstanceMetadata>> allInstances() throws ServiceCallException {
+    public Collection<ServiceInstance<MicroserviceMetaData>> allInstances() throws ServiceCallException {
         try {
-            Collection<ServiceInstance<InstanceMetadata>> result = new ArrayList<>();
-            Collection<String> services = discovery.queryForNames();
+            Collection<ServiceInstance<MicroserviceMetaData>> result = new ArrayList<>();
+            Collection<String> services = serviceDiscovery.queryForNames();
             if (services.size() == 0) {
                 return new ArrayList<>();
             }
             for (String service : services) {
-                result.addAll(instances(service));
+                result.addAll(allInstances(service));
             }
             return result;
-        }catch(NoNodeException nne){
-            logger.info("No nodes found. Details: " + nne.getMessage());
-            return Collections.emptyList();
         }catch (Exception e) {
             throw new ServiceCallException(e);
         }
@@ -119,62 +123,35 @@ public class ServiceLocator {
     /**
      * Returns all serviceinstances of all microservices registered with zookeeper mapped by name (type).
      */
-    public Map<String, Collection<ServiceInstance<InstanceMetadata>>> allInstancesMap()
+    public Map<String, Collection<ServiceInstance<MicroserviceMetaData>>> allInstancesMap()
             throws ServiceCallException {
         try {
-            Map<String, Collection<ServiceInstance<InstanceMetadata>>> map = new HashMap<>();
-            Collection<String> services = discovery.queryForNames();
+            Map<String, Collection<ServiceInstance<MicroserviceMetaData>>> map = new HashMap<>();
+            Collection<String> services = serviceDiscovery.queryForNames();
             for (String service : services) {
-                map.put(service, instances(service));
+                map.put(service, allInstances(service));
             }
 
             return map;
-        }catch(NoNodeException nne){
-            logger.info("No nodes found. Details: " + nne.getMessage());
-            return Collections.emptyMap();
         } catch (Exception e) {
             throw new ServiceCallException(e);
         }
     }
 
-    private ServiceInstance<InstanceMetadata> pickRandomService(String servicename) throws ServiceCallException {
-
-        try {
-            ArrayList<ServiceInstance<InstanceMetadata>> instances
-                    = new ArrayList<>(discovery.queryForInstances(servicename));
-            if (instances.size() == 0) {
-                throw new IllegalArgumentException("no services found in zookeeper with name: "+ servicename);
-            }
-
-            ServiceInstance<InstanceMetadata> instance = instances.get(counter(servicename) % instances.size());
-
-            connections.add(instance.getPayload());
-            return instance;
-
-        } catch (Exception e) {
-            throw new ServiceCallException(e);
-        }
-
+    private Collection<ServiceInstance<MicroserviceMetaData>> allInstances(String servicename) throws Exception{
+        DiscoveryClient<MicroserviceMetaData> client = new DiscoveryClient<>(servicename,
+                serviceDiscovery,
+                new DownInstancePolicy(),
+                new RoundRobinStrategy<MicroserviceMetaData>());
+        client.start();
+        Collection<ServiceInstance<MicroserviceMetaData>> instances = client.getInstances();
+        client.close();
+        return instances;
     }
 
-    private static Integer counter(String servicename) {
-        Integer count = 0;
-        if(roundRobin.containsKey(servicename)) {
-            count = roundRobin.get(servicename);
-        }
-        count++;
-        roundRobin.put(servicename, count);
-        return count;
-    }
-
-    public List<InstanceMetadata> getConnections() {
-        return connections;
-    }
-
-    public static void createInstance(ServiceDiscovery<InstanceMetadata> discovery, ObjectMapper objectMapper) {
+    public static void createInstance(MicroserviceDiscoveryBundle discoveryBundle) {
         DEFAULTINSTANCE = new ServiceLocator();
-        DEFAULTINSTANCE.discovery = discovery;
-        DEFAULTINSTANCE.objectMapper = objectMapper;
+        DEFAULTINSTANCE.discoveryBundle = discoveryBundle;
     }
 
     /**
@@ -184,14 +161,16 @@ public class ServiceLocator {
         return DEFAULTINSTANCE;
     }
 
-    public static ServiceLocator getInstance(ServiceDiscovery<InstanceMetadata> discovery, ObjectMapper objectMapper) {
-        ServiceLocator serviceLocator = new ServiceLocator();
-        serviceLocator.discovery = discovery;
-        serviceLocator.objectMapper = objectMapper;
-        return serviceLocator;
+    public ServiceDiscovery<MicroserviceMetaData> getServiceDiscovery() {
+        return discoveryBundle != null ? discoveryBundle.getServiceDiscovery() : serviceDiscovery;
     }
 
-    public ServiceDiscovery<InstanceMetadata> getServiceDiscovery() {
-        return discovery;
+    /**
+     * Returns the default instance.
+     */
+    public static ServiceLocator getInstance(ServiceDiscovery serviceDiscovery) {
+        ServiceLocator serviceLocator = new ServiceLocator();
+        serviceLocator.serviceDiscovery = serviceDiscovery;
+        return serviceLocator;
     }
 }

@@ -1,30 +1,28 @@
 package com.aegal.framework.core;
 
-import com.aegal.framework.core.auth.AuthConfig;
-import com.aegal.framework.core.database.DbConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ge.snowizard.discovery.DiscoveryFactory;
 import com.yammer.tenacity.core.config.BreakerboxConfiguration;
 import io.dropwizard.Configuration;
+import io.dropwizard.discovery.DiscoveryFactory;
 
 /**
  * User: A.Egal
  * Date: 8/7/14
  * Time: 8:30 PM
  */
-public abstract class MicroserviceConfig extends Configuration {
+public class MicroserviceConfig extends Configuration {
 
     @JsonProperty("discovery")
     private DiscoveryFactory discoveryFactory;
+
+    @JsonProperty("version")
+    private String version;
 
     @JsonProperty("test")
     private boolean test = false;
 
     @JsonProperty("allow-origin")
     private boolean allowOrigin = true;
-
-    @JsonProperty("authentication")
-    private AuthConfig authConfig;
 
     @JsonProperty("breakerbox")
     private BreakerboxConfiguration breakerboxConfiguration;
@@ -36,16 +34,6 @@ public abstract class MicroserviceConfig extends Configuration {
     public void setDiscoveryFactory(DiscoveryFactory discoveryFactory) {
         this.discoveryFactory = discoveryFactory;
     }
-
-    public AuthConfig getAuthConfig() {
-        return authConfig;
-    }
-
-    public void setAuthConfig(AuthConfig authConfig) {
-        this.authConfig = authConfig;
-    }
-
-    public abstract DbConfig getDatabaseConfig();
 
     public boolean isTest() {
         return test;
@@ -61,5 +49,9 @@ public abstract class MicroserviceConfig extends Configuration {
 
     public void setBreakerboxConfiguration(BreakerboxConfiguration breakerboxConfiguration) {
         this.breakerboxConfiguration = breakerboxConfiguration;
+    }
+
+    public String getVersion() {
+        return version;
     }
 }

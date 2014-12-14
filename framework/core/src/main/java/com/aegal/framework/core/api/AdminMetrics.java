@@ -12,15 +12,15 @@ import javax.ws.rs.Produces;
  */
 public interface AdminMetrics {
 
-    @RequestLine("GET /healthcheck")
+    @RequestLine("GET")
     @Produces("application/json")
     JsonNode healthcheck();
 
-    @RequestLine("GET /metrics")
+    @RequestLine("GET")
     @Produces("application/json")
     JsonNode metrics();
 
-    @RequestLine("GET /ping")
+    @RequestLine("GET")
     String ping();
 
 }

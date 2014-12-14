@@ -1,11 +1,11 @@
 package com.aegal.frontend.resources;
 
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
 import com.aegal.frontend.commands.*;
 import com.aegal.frontend.dto.D3GraphDTO;
 import com.aegal.frontend.dto.HealthCheckDTO;
 import com.aegal.frontend.dto.MetricsDTO;
 import com.aegal.frontend.srv.NamespacesManager;
-import com.ge.snowizard.discovery.core.InstanceMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,21 +31,21 @@ public class OverviewResource {
 
     @GET
     @Path("findservices")
-    public List<D3GraphDTO<InstanceMetadata>> findServices(@PathParam("namespace") String ns) {
+    public List<D3GraphDTO<MicroserviceMetaData>> findServices(@PathParam("namespace") String ns) {
         return new BuildGraphServiceCommand(namespacesManager.getServiceLocator(ns)).execute();
     }
 
     @POST
     @Path("healthcheck")
     @Consumes("application/json")
-    public HealthCheckDTO healthcheck(@PathParam("namespace") String ns, InstanceMetadata serviceInstance) {
+    public HealthCheckDTO healthcheck(@PathParam("namespace") String ns, MicroserviceMetaData serviceInstance) {
         return new HealthCheckCommand(ns, serviceInstance, namespacesManager).execute();
     }
 
     @POST
     @Path("metrics")
     @Consumes("application/json")
-    public MetricsDTO findMetrics(@PathParam("namespace") String ns, InstanceMetadata serviceInstance) {
+    public MetricsDTO findMetrics(@PathParam("namespace") String ns, MicroserviceMetaData serviceInstance) {
         return MetricsCommand.create(ns, namespacesManager).findOne(serviceInstance).execute();
     }
 
@@ -62,14 +62,14 @@ public class OverviewResource {
     @Consumes("application/json")
     public javax.ws.rs.core.Response findLogFile(@PathParam("namespace") final String ns,
                                                  @PathParam("lines") final Integer lines,
-                                                 final InstanceMetadata serviceInstance) throws Exception {
+                                                 final MicroserviceMetaData serviceInstance) throws Exception {
         return new LogFileCommand(ns, lines, serviceInstance, namespacesManager).execute();
     }
 
     @POST
     @Path("ping")
     @Consumes("application/json")
-    public String ping(@PathParam("namespace") String ns, InstanceMetadata serviceInstance) throws Exception {
+    public String ping(@PathParam("namespace") String ns, MicroserviceMetaData serviceInstance) throws Exception {
         return new PingCommand(namespacesManager, serviceInstance, ns).execute();
     }
 

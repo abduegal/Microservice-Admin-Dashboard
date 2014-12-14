@@ -1,8 +1,8 @@
 package com.aegal.frontend.srv;
 
 import com.aegal.framework.core.ServiceLocator;
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
 import com.aegal.frontend.dto.SubscribeRequest;
-import com.ge.snowizard.discovery.core.InstanceMetadata;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.apache.curator.x.discovery.ServiceInstanceBuilder;
@@ -36,7 +36,7 @@ public class SubscribeManager implements Runnable {
 
     public void addSubscription(SubscribeRequest request) {
 
-        ServiceLocator serviceLocator = namespacesManager.getServiceLocator(request.getNamespace());
+        ServiceLocator serviceLocator = namespacesManager.getServiceLocator(request.namespace);
         if (serviceLocator == null) {
             throw new WebApplicationException(new IllegalArgumentException("namespace does not exist."), BAD_REQUEST);
         }
@@ -53,18 +53,20 @@ public class SubscribeManager implements Runnable {
         while (true) {
 
             for (SubscribeRequest subscription : subscriptions) {
+                System.out.println(subscription.active);
+                System.out.println(subscription.isExpired());
                 // check if an active connection exists:
-                if (subscription.isActive()) {
+                if (subscription.active) {
                     // check if the active connection should end
                     if (subscription.isExpired()) {
                         endConnection(subscription);
-                        subscription.setActive(false);
+                        subscription.active = false;
                     }
 
                 } else {
                     if (!subscription.isExpired()) {
                         createConnection(subscription); // create connection
-                        subscription.setActive(true);
+                        subscription.active = true;
                     }
                 }
             }
@@ -79,8 +81,8 @@ public class SubscribeManager implements Runnable {
 
     public void createConnection(SubscribeRequest subscription) {
         try {
-            ServiceLocator serviceLocator = namespacesManager.getServiceLocator(subscription.getNamespace());
-            ServiceDiscovery<InstanceMetadata> serviceDiscovery = serviceLocator.getServiceDiscovery();
+            ServiceLocator serviceLocator = namespacesManager.getServiceLocator(subscription.namespace);
+            ServiceDiscovery<MicroserviceMetaData> serviceDiscovery = serviceLocator.getServiceDiscovery();
             serviceDiscovery.registerService(convert(subscription));
         } catch (Exception ex) {
             LOGGER.error("Unable to handle the Zookeeper request", ex);
@@ -90,8 +92,8 @@ public class SubscribeManager implements Runnable {
 
     public void endConnection(SubscribeRequest subscription) {
         try {
-            ServiceLocator serviceLocator = namespacesManager.getServiceLocator(subscription.getNamespace());
-            ServiceDiscovery<InstanceMetadata> serviceDiscovery = serviceLocator.getServiceDiscovery();
+            ServiceLocator serviceLocator = namespacesManager.getServiceLocator(subscription.namespace);
+            ServiceDiscovery<MicroserviceMetaData> serviceDiscovery = serviceLocator.getServiceDiscovery();
             serviceDiscovery.unregisterService(convert(subscription));
 
         } catch (Exception ex) {
@@ -100,13 +102,25 @@ public class SubscribeManager implements Runnable {
 
     }
 
-    public ServiceInstance<InstanceMetadata> convert(SubscribeRequest subscription) throws Exception {
-        ServiceInstanceBuilder<InstanceMetadata> builder = ServiceInstance.builder();
+    public ServiceInstance<MicroserviceMetaData> convert(SubscribeRequest subscription) throws Exception {
+        ServiceInstanceBuilder<MicroserviceMetaData> builder = ServiceInstance.builder();
         return builder.serviceType(ServiceType.DYNAMIC)
-                .name(subscription.getServicename())
-                .address(subscription.getAddress())
-                .port(subscription.getPort())
-                .payload(new InstanceMetadata(UUID.nameUUIDFromBytes(subscription.toString().getBytes()), subscription.getAddress(), subscription.getPort()))
+                .name(subscription.servicename)
+                .address(subscription.address)
+                .port(subscription.port)
+                .payload(new MicroserviceMetaData(
+                        UUID.nameUUIDFromBytes(subscription.toString().getBytes()),
+                        subscription.address,
+                        subscription.port,
+                        subscription.version,
+                        subscription.getAdminPort(),
+                        subscription.logFileLocation,
+                        subscription.getHealthcheckport(),
+                        subscription.getHealthcheckaddress(),
+                        subscription.getMetricsport(),
+                        subscription.getMetricsaddress(),
+                        subscription.getPingport(),
+                        subscription.getPingaddress()))
                 .build();
     }
 

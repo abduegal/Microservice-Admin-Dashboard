@@ -1,6 +1,5 @@
 package com.aegal.framework.core;
 
-import com.aegal.framework.core.exceptions.ServiceCallException;
 import com.aegal.framework.core.exceptions.ServiceHTTPException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.*;
@@ -16,16 +15,14 @@ import java.io.IOException;
  */
 public class FeignBuilder {
 
-    private final ObjectMapper objectMapper;
+    private static ObjectMapper objectMapper;
     private final boolean IN_DEBUG = false;
     private boolean serialize = true; //adds decoder and encoder.
 
-    public FeignBuilder(final ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public FeignBuilder() {
     }
 
-    public FeignBuilder(ObjectMapper objectMapper, boolean serialize) {
-        this.objectMapper = objectMapper;
+    public FeignBuilder(boolean serialize) {
         this.serialize = serialize;
     }
 
@@ -38,6 +35,7 @@ public class FeignBuilder {
             builder.decoder(new JacksonDecoder(objectMapper))
                    .encoder(new JacksonEncoder(objectMapper));
         }
+
         if (IN_DEBUG) {
             builder.logger(new Logger.ErrorLogger()).logLevel(Logger.Level.FULL);
         }
@@ -65,5 +63,9 @@ public class FeignBuilder {
                 template.header("Content-Type", "Application/JSON");
             }
         };
+    }
+
+    public static void setObjectMapper(ObjectMapper objectMapper) {
+        FeignBuilder.objectMapper = objectMapper;
     }
 }

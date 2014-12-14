@@ -12,6 +12,8 @@ public class Guard<T> {
 
     /**
      * Returns a GuardException if the object is null.
+     * @return the same object if the guard passes.
+     * @param object the object to perform the nullcheck with.
      */
     public static <T> T notNull(T object) {
         if (object == null) {

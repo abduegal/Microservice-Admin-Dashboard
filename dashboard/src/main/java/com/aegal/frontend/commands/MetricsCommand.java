@@ -1,7 +1,9 @@
 package com.aegal.frontend.commands;
 
+import com.aegal.framework.core.FeignBuilder;
 import com.aegal.framework.core.ServiceLocator;
 import com.aegal.framework.core.api.AdminMetrics;
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
 import com.aegal.frontend.DependencyKeys;
 import com.aegal.frontend.dto.MetricsDTO;
 import com.aegal.frontend.srv.NamespacesManager;
@@ -11,7 +13,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.yammer.tenacity.core.TenacityCommand;
@@ -28,7 +29,7 @@ public class MetricsCommand extends TenacityCommand<MetricsDTO> {
 
     private Mode mode;
     private final String ns;
-    private InstanceMetadata serviceInstance;
+    private MicroserviceMetaData instance;
     private final NamespacesManager namespacesManager;
     private String filter;
 
@@ -42,8 +43,10 @@ public class MetricsCommand extends TenacityCommand<MetricsDTO> {
     @Override
     protected MetricsDTO run() throws Exception {
         if (mode.equals(Mode.FINDONE)) {
+            String address = ServiceLocator.getInstance().buildAddress(
+                    instance.getListenAddress(), instance.getMetricsport()) + instance.getMetricsaddress();
             return MetricsDTO.from(
-                    namespacesManager.getServiceLocator(ns).buildAdmin(serviceInstance, AdminMetrics.class).metrics()
+                    new FeignBuilder().build(address, AdminMetrics.class).metrics()
             );
         } else if (mode.equals(Mode.SEARCH)) {
             return search();
@@ -103,7 +106,7 @@ public class MetricsCommand extends TenacityCommand<MetricsDTO> {
         ArrayNode arrayNode = mapper.createArrayNode();
 
         ServiceLocator serviceLocator = namespacesManager.getServiceLocator(ns);
-        for (ServiceInstance<InstanceMetadata> s : serviceLocator.allInstances()) {
+        for (ServiceInstance<MicroserviceMetaData> s : serviceLocator.allInstances()) {
 
             ObjectNode resultNode = mapper.createObjectNode();
             //set service node
@@ -114,7 +117,9 @@ public class MetricsCommand extends TenacityCommand<MetricsDTO> {
             resultNode.set("service", serviceNode);
 
             //get metrics node with subnotes named like filter parts
-            JsonNode metrics = namespacesManager.getServiceLocator(ns).buildAdmin(s.getPayload(), AdminMetrics.class).metrics();
+            String address = ServiceLocator.getInstance().buildAddress(
+                    instance.getListenAddress(), instance.getMetricsport()) + instance.getMetricsaddress();
+            JsonNode metrics = new FeignBuilder().build(address, AdminMetrics.class).metrics();
             ObjectNode metricsNode = mapper.createObjectNode();
 
             for (String filterPart : Splitter.on(',').omitEmptyStrings().trimResults().splitToList(filter)) {
@@ -147,9 +152,9 @@ public class MetricsCommand extends TenacityCommand<MetricsDTO> {
             return metricsCommand;
         }
 
-        public MetricsCommand findOne(InstanceMetadata serviceInstance) {
+        public MetricsCommand findOne(MicroserviceMetaData serviceInstance) {
             metricsCommand.mode = Mode.FINDONE;
-            metricsCommand.serviceInstance = serviceInstance;
+            metricsCommand.instance = serviceInstance;
             return metricsCommand;
         }
 

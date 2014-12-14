@@ -1,9 +1,8 @@
 package com.aegal.frontend.commands;
 
-import com.aegal.framework.core.api.LogFile;
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
 import com.aegal.frontend.DependencyKeys;
 import com.aegal.frontend.srv.NamespacesManager;
-import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.yammer.tenacity.core.TenacityCommand;
 
 import javax.ws.rs.WebApplicationException;
@@ -22,12 +21,12 @@ public class LogFileCommand extends TenacityCommand<Response> {
 
     private final String ns;
     private final Integer lines;
-    private final InstanceMetadata serviceInstance;
+    private final MicroserviceMetaData serviceInstance;
     private final NamespacesManager namespacesManager;
 
     public LogFileCommand(final String ns,
                           final Integer lines,
-                          final InstanceMetadata serviceInstance,
+                          final MicroserviceMetaData serviceInstance,
                           final NamespacesManager namespacesManager) {
 
         super(DependencyKeys.DASHBOARD_READ_LOGFILE);
@@ -39,8 +38,7 @@ public class LogFileCommand extends TenacityCommand<Response> {
 
     @Override
     protected Response run() throws Exception {
-        String logFile = namespacesManager.getServiceLocator(ns).buildNoSerialize(serviceInstance, LogFile.class).getLogFile();
-        return readLogFiles(logFile);
+        return readLogFiles(serviceInstance.getLogfileName());
     }
 
     @Override

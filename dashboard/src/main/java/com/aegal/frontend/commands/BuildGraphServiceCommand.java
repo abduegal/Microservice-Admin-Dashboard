@@ -1,12 +1,14 @@
 package com.aegal.frontend.commands;
 
+import com.aegal.framework.core.FeignBuilder;
 import com.aegal.framework.core.ServiceLocator;
 import com.aegal.framework.core.api.Connections;
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
 import com.aegal.framework.core.exceptions.ServiceCallException;
 import com.aegal.frontend.DependencyKeys;
 import com.aegal.frontend.dto.D3GraphDTO;
-import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.yammer.tenacity.core.TenacityCommand;
+import feign.Feign;
 import org.apache.curator.x.discovery.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +18,7 @@ import java.util.*;
 /**
  * Created by vagrant on 11/12/14.
  */
-public class BuildGraphServiceCommand extends TenacityCommand<List<D3GraphDTO<InstanceMetadata>>> {
+public class BuildGraphServiceCommand extends TenacityCommand<List<D3GraphDTO<MicroserviceMetaData>>> {
 
     private static final Logger logger = LoggerFactory.getLogger(BuildGraphServiceCommand.class);
     private final ServiceLocator serviceLocator;
@@ -28,13 +30,13 @@ public class BuildGraphServiceCommand extends TenacityCommand<List<D3GraphDTO<In
     }
 
     @Override
-    protected List<D3GraphDTO<InstanceMetadata>> run() throws Exception {
-        List<D3GraphDTO<InstanceMetadata>> result = new ArrayList<>();
+    protected List<D3GraphDTO<MicroserviceMetaData>> run() throws Exception {
+        List<D3GraphDTO<MicroserviceMetaData>> result = new ArrayList<>();
 
-        Map<String, Collection<ServiceInstance<InstanceMetadata>>> instances = serviceLocator.allInstancesMap();
+        Map<String, Collection<ServiceInstance<MicroserviceMetaData>>> instances = serviceLocator.allInstancesMap();
         for (String servicename : instances.keySet()) {
-            for (ServiceInstance<InstanceMetadata> instance : instances.get(servicename)) {
-                D3GraphDTO<InstanceMetadata> graphDTO = new D3GraphDTO<InstanceMetadata>();
+            for (ServiceInstance<MicroserviceMetaData> instance : instances.get(servicename)) {
+                D3GraphDTO<MicroserviceMetaData> graphDTO = new D3GraphDTO<>();
 
                 buildGraphDto(graphDTO, instance, servicename, instances);
 
@@ -44,9 +46,9 @@ public class BuildGraphServiceCommand extends TenacityCommand<List<D3GraphDTO<In
         return result;
     }
 
-    private void buildGraphDto(final D3GraphDTO<InstanceMetadata> graphDTO,
-                               final ServiceInstance<InstanceMetadata> instance, String servicename,
-                               final Map<String, Collection<ServiceInstance<InstanceMetadata>>> instances) throws ServiceCallException {
+    private void buildGraphDto(final D3GraphDTO<MicroserviceMetaData> graphDTO,
+                               final ServiceInstance<MicroserviceMetaData> instance, String servicename,
+                               final Map<String, Collection<ServiceInstance<MicroserviceMetaData>>> instances) throws ServiceCallException {
 
         graphDTO.id = instance.getPayload().getInstanceId().toString();
         graphDTO.group = groupForServiceName(servicename);
@@ -54,9 +56,6 @@ public class BuildGraphServiceCommand extends TenacityCommand<List<D3GraphDTO<In
         graphDTO.location = String.format("%s:%s", instance.getAddress(), instance.getPort());
         graphDTO.size = 10 + 30 / instances.get(servicename).size();
         graphDTO.data = instance.getPayload();
-
-        graphDTO.links = new AddConnectionInformationCommand(instance).execute();
-
     }
 
     private static int groupForServiceName(String serviceName) {
@@ -66,26 +65,6 @@ public class BuildGraphServiceCommand extends TenacityCommand<List<D3GraphDTO<In
             serviceNameGroupId.put(serviceName, id);
         }
         return id;
-    }
-
-    protected class AddConnectionInformationCommand extends TenacityCommand<List<InstanceMetadata>> {
-        private final ServiceInstance<InstanceMetadata> instance;
-
-        public AddConnectionInformationCommand(final ServiceInstance<InstanceMetadata> instance) {
-            super(DependencyKeys.DASHBOARD_FIND_CONNECTIONS);
-            this.instance = instance;
-        }
-
-        @Override
-        protected List<InstanceMetadata> run() throws Exception {
-            return serviceLocator.build(instance.getPayload(), Connections.class).getConnections();
-        }
-
-        @Override
-        protected List<InstanceMetadata> getFallback() {
-            logger.error("Error while building the d3 graph: ");
-            return new ArrayList<>();
-        }
     }
 
 }

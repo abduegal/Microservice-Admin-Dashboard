@@ -7,47 +7,27 @@ import java.util.Date;
  * Created by vagrant on 10/20/14.
  */
 public class SubscribeRequest {
-    private final String servicename;
-    private final String address;
-    private final int port;
-    private final String namespace;
-    private final int timeToLive;
-    private final long timeOfRequest;
+    public String servicename;
+    public String address;
+    public int port;
+    public String namespace;
+    public int timeToLive;
+    public long timeOfRequest = new Date().getTime();
 
-    private boolean active;
+    public String version;
+    public String logFileLocation;
+    private Integer adminPort;
 
-    public SubscribeRequest(String servicename, String address, int port, String namespace, int timeToLive) {
-        this.timeToLive = timeToLive;
-        this.address = address;
-        this.port = port;
-        this.servicename = servicename;
-        this.namespace = namespace;
-        this.timeOfRequest = new Date().getTime();
-    }
+    public boolean active;
 
-    public String getServicename() {
-        return servicename;
-    }
+    private Integer healthcheckport;
+    private String healthcheckaddress;
 
-    public String getAddress() {
-        return address;
-    }
+    private Integer metricsport;
+    private String metricsaddress;
 
-    public int getPort() {
-        return port;
-    }
-
-    public int getTimeToLive() {
-        return timeToLive;
-    }
-
-    public long getTimeOfRequest() {
-        return timeOfRequest;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
+    private Integer pingport;
+    private String pingaddress;
 
     public boolean isExpired() {
         return new Date().getTime() > timeOfRequest + (timeToLive * 1000);
@@ -55,14 +35,6 @@ public class SubscribeRequest {
 
     public String getKey() {
         return String.format("%s/%s", namespace, servicename);
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     @Override
@@ -87,5 +59,61 @@ public class SubscribeRequest {
         result = 31 * result + port;
         result = 31 * result + (namespace != null ? namespace.hashCode() : 0);
         return result;
+    }
+
+    public void setAdminPort(Integer adminPort) {
+        this.adminPort = adminPort;
+    }
+
+    public Integer getAdminPort() {
+        return adminPort != null ? adminPort : port;
+    }
+
+    public Integer getHealthcheckport() {
+        return healthcheckport != null ? healthcheckport : getAdminPort();
+    }
+
+    public void setHealthcheckport(Integer healthcheckport) {
+        this.healthcheckport = healthcheckport;
+    }
+
+    public String getHealthcheckaddress() {
+        return healthcheckaddress != null ? healthcheckaddress: "/";
+    }
+
+    public void setHealthcheckaddress(String healthcheckaddress) {
+        this.healthcheckaddress = healthcheckaddress;
+    }
+
+    public Integer getMetricsport() {
+        return metricsport != null ? metricsport : getAdminPort();
+    }
+
+    public void setMetricsport(Integer metricsport) {
+        this.metricsport = metricsport;
+    }
+
+    public String getMetricsaddress() {
+        return metricsaddress != null ? metricsaddress: "/";
+    }
+
+    public void setMetricsaddress(String metricsaddress) {
+        this.metricsaddress = metricsaddress;
+    }
+
+    public Integer getPingport() {
+        return pingport != null ? pingport : getAdminPort();
+    }
+
+    public void setPingport(Integer pingport) {
+        this.pingport = pingport;
+    }
+
+    public String getPingaddress() {
+        return pingaddress != null ? pingaddress: "/";
+    }
+
+    public void setPingaddress(String pingaddress) {
+        this.pingaddress = pingaddress;
     }
 }

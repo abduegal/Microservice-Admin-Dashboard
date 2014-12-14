@@ -1,9 +1,11 @@
 package com.aegal.frontend.commands;
 
+import com.aegal.framework.core.FeignBuilder;
+import com.aegal.framework.core.ServiceLocator;
 import com.aegal.framework.core.api.AdminMetrics;
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
 import com.aegal.frontend.DependencyKeys;
 import com.aegal.frontend.srv.NamespacesManager;
-import com.ge.snowizard.discovery.core.InstanceMetadata;
 import com.yammer.tenacity.core.TenacityCommand;
 
 /**
@@ -12,21 +14,23 @@ import com.yammer.tenacity.core.TenacityCommand;
 public class PingCommand extends TenacityCommand<String> {
 
     private NamespacesManager namespacesManager;
-    private InstanceMetadata serviceInstance;
+    private MicroserviceMetaData instance;
     private String ns;
 
     public PingCommand(final NamespacesManager namespacesManager,
-                       final InstanceMetadata serviceInstance,
+                       final MicroserviceMetaData instance,
                        final String ns) {
         super(DependencyKeys.DASHBOARD_PING);
         this.namespacesManager = namespacesManager;
-        this.serviceInstance = serviceInstance;
+        this.instance = instance;
         this.ns = ns;
     }
 
     @Override
     protected String run() throws Exception {
-        return namespacesManager.getServiceLocator(ns).buildAdminNoSerialize(serviceInstance, AdminMetrics.class).ping();
+        String address = ServiceLocator.getInstance().buildAddress(
+                instance.getListenAddress(), instance.getPingport()) + instance.getPingaddress();
+        return new FeignBuilder(false).build(address, AdminMetrics.class).ping();
     }
 
     @Override

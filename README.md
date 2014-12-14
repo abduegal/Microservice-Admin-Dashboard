@@ -40,9 +40,9 @@ Screenshots
 Installation:
 ----
 - Install  [Apache Zookeeper](http://zookeeper.apache.org/) and run it.
-- Download the dashboard [here](https://github.com/abduegal/Microservice_admin_dashboard/raw/master/dashboard-release-0.8.1.zip) and extract the zip file.
+- Download the dashboard [here](https://github.com/abduegal/Microservice_admin_dashboard/raw/master/dashboard-release-0.9.0.zip) and extract the zip file.
 - Run the dashboard through the following command:  
-``` java -jar dashboard-0.8.1.jar server config.yml```
+``` java -jar dashboard-0.9.0.jar server config.yml```
 - The dashboard should be up and running on [http://localhost:8080](http://localhost:8080)
 
 Getting started
@@ -57,7 +57,7 @@ After you have got the dashboard up and running, create a new Dropwizard project
     <dependency>
         <groupId>com.github.abduegal</groupId>
         <artifactId>microservice-framework-core</artifactId>
-        <version>0.8.1</version>
+        <version>0.9.0</version>
     </dependency>
 ```
 - Make your dropwizard Configuration class extend from MicroserviceConfig instead of the io.dropwizard.Configuration class.
@@ -146,7 +146,7 @@ Optionally:
 Version
 ----
 
-0.8.1
+0.9.0
 
 Tech
 -----------

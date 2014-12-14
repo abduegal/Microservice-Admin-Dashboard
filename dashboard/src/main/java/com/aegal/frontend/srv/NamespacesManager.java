@@ -1,12 +1,13 @@
 package com.aegal.frontend.srv;
 
 import com.aegal.framework.core.ServiceLocator;
+import com.aegal.framework.core.discovery.MicroserviceDiscoveryBundle;
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
 import com.aegal.frontend.FrontendConfig;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.ge.snowizard.discovery.core.InstanceMetadata;
-import com.ge.snowizard.discovery.core.JacksonInstanceSerializer;
-import com.ge.snowizard.discovery.health.CuratorHealthCheck;
-import com.ge.snowizard.discovery.manage.CuratorManager;
+import io.dropwizard.discovery.core.JacksonInstanceSerializer;
+import io.dropwizard.discovery.health.CuratorHealthCheck;
+import io.dropwizard.discovery.manage.CuratorManager;
 import io.dropwizard.setup.Environment;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -34,8 +35,8 @@ public class NamespacesManager {
     }
 
     private void build(Environment environment) {
-        final JacksonInstanceSerializer<InstanceMetadata> serializer = new JacksonInstanceSerializer<InstanceMetadata>(
-                environment.getObjectMapper(), new TypeReference<ServiceInstance<InstanceMetadata>>() {
+        final JacksonInstanceSerializer<MicroserviceMetaData> serializer = new JacksonInstanceSerializer<>(
+                environment.getObjectMapper(), new TypeReference<ServiceInstance<MicroserviceMetaData>>() {
         });
 
         for (String namespace : config.getNamespaces()) {
@@ -52,16 +53,14 @@ public class NamespacesManager {
                     .namespace(namespace).build();
 
             environment.lifecycle().manage(new CuratorManager(framework));
-            environment.healthChecks().register("curator",
-                    new CuratorHealthCheck(framework));
+            environment.healthChecks().register("curator", new CuratorHealthCheck(framework));
 
-            ServiceDiscovery<InstanceMetadata> discovery = ServiceDiscoveryBuilder.builder(InstanceMetadata.class)
-                    .basePath(
-                            this.config.getDiscoveryFactory().getBasePath())
+            ServiceDiscovery<MicroserviceMetaData> discovery = ServiceDiscoveryBuilder.builder(MicroserviceMetaData.class)
+                    .basePath("/" + this.config.getDiscoveryFactory().getBasePath())
                     .client(framework)
                     .serializer(serializer).build();
 
-            namespaceWithServiceDiscovery.put(namespace, ServiceLocator.getInstance(discovery, environment.getObjectMapper()));
+            namespaceWithServiceDiscovery.put(namespace, ServiceLocator.getInstance(discovery));
         }
     }
 

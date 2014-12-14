@@ -2,6 +2,7 @@ discovery:
   #zookeeper:
   port: 2181
   listenAddress: 127.0.0.1
+  serviceName: dashboard
 
 namespaces:
   - myapp

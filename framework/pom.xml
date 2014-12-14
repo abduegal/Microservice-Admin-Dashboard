@@ -7,22 +7,22 @@
     <groupId>com.github.abduegal</groupId>
     <artifactId>microservice-framework</artifactId>
     <packaging>pom</packaging>
-    <version>0.8.1-SNAPSHOT</version>
+    <version>0.9.0</version>
     <modules>
         <module>core</module>
     </modules>
 
     <name>Microservice framework core</name>
     <description>framework for microservices with dropwizard</description>
-    <url>http://github.com/abduegal/microservice-framework</url>
+    <url>https://github.com/abduegal/Microservice-Admin-Dashboard</url>
     <scm>
-        <connection>empty</connection>
-        <developerConnection>empty</developerConnection>
-        <url>empty</url>
+        <url>https://github.com/abduegal/Microservice-Admin-Dashboard</url>
+        <connection>scm:git:git://github.com/abduegal/Microservice-Admin-Dashboard.git</connection>
+        <developerConnection>scm:git:git://github.com/abduegal/Microservice-Admin-Dashboard.git</developerConnection>
     </scm>
 
     <properties>
-        <dropwizard.version>0.7.0-rc2</dropwizard.version>
+        <dropwizard.version>0.7.0</dropwizard.version>
     </properties>
 
     <licenses>
@@ -35,8 +35,8 @@
 
     <developers>
         <developer>
-            <email>abduegal@gmail.com</email>
-            <name>AEgal</name>
+            <email>abdu.egal@gmail.com</email>
+            <name>Abdullahi Egal</name>
             <url>https://github.com/abduegal</url>
             <id>abduegal</id>
         </developer>
@@ -49,9 +49,9 @@
             <version>2.1.4.Final</version>
         </dependency>
         <dependency>
-            <groupId>com.ge.snowizard</groupId>
-            <artifactId>snowizard-discovery</artifactId>
-            <version>0.7.0</version>
+            <groupId>io.dropwizard.modules</groupId>
+            <artifactId>dropwizard-discovery</artifactId>
+            <version>0.7.1-5</version>
         </dependency>
         <dependency>
             <groupId>io.dropwizard</groupId>
@@ -61,7 +61,7 @@
         <dependency>
             <groupId>io.dropwizard</groupId>
             <artifactId>dropwizard-auth</artifactId>
-            <version>${dropwizard.version}</version>
+            <version>0.7.0-rc2</version>
         </dependency>
         <dependency>
             <groupId>net.sf.dozer</groupId>
@@ -157,6 +157,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
@@ -187,21 +188,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.2</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
             </plugin>
         </plugins>
     </build>

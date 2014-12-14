@@ -1,6 +1,6 @@
 package com.aegal.framework.core.api;
 
-import com.ge.snowizard.discovery.core.InstanceMetadata;
+import com.aegal.framework.core.discovery.MicroserviceMetaData;
 import feign.RequestLine;
 
 import javax.ws.rs.Produces;
@@ -15,6 +15,6 @@ public interface Connections {
 
     @RequestLine("GET /api/connections")
     @Produces("application/json")
-    List<InstanceMetadata> getConnections();
+    List<MicroserviceMetaData> getConnections();
 
 }
